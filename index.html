@@ -130,19 +130,11 @@
   .tag.big { font-size: 1rem; padding: 6px 14px; }
 
   footer { text-align: center; color: var(--muted); font-size: .85rem; padding: 24px 16px 40px; }
-  footer a { color: var(--text); font-weight: 700; }
-
-  .legal-link { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 40px; padding: 16px;
-    background: var(--card); border: 1px solid var(--border); border-radius: 16px; text-decoration: none; font-weight: 700; font-size: 1.1rem; }
-  .legal-link:hover { border-color: var(--accent); }
-  .legal { max-width: 760px; }
-  .legal h2 { margin-top: 32px; }
-  .legal h3 { margin: 18px 0 6px; font-size: 1.05rem; }
-  .legal p { line-height: 1.6; }
+  footer .imp { display: block; width: fit-content; margin: 8px auto 0; font-size: .72rem; color: var(--muted); text-decoration: none; opacity: .75; }
+  footer .imp:hover { text-decoration: underline; opacity: 1; }
+  .legal { max-width: 640px; }
+  .legal p { line-height: 1.6; margin: 0 0 10px; } .legal p:last-child { margin-bottom: 0; }
   .legal a { color: var(--accent); }
-  .legal .about p { margin: 0; }
-  .legal .fill { color: #ff7b7b; font-weight: 700; }
-  .legal small { color: var(--muted); }
 
   @media (max-width: 560px) {
     .nav-link, .drop-btn { padding: 8px 8px; }
@@ -204,21 +196,12 @@ const ICH = {
   ],
 
   // ---------- IMPRESSUM ----------
-  // Zurzeit ausgeschaltet. Zum Einschalten auf true setzen – dann erscheint
-  // unten auf „Über mich“ und in der Fußzeile ein Link zum Impressum.
-  impressumAnzeigen: false,
-  // Alles in [eckigen Klammern] MUSST du durch echte Angaben ersetzen –
-  // solange etwas in [Klammern] steht, wird es im Impressum rot angezeigt.
-  // Die Adresse muss eine echte Post-Adresse sein (kein Postfach).
-  impressum: {
-    name: 'Rafael [NACHNAME]',
-    strasse: '[Straße Hausnummer]',
-    ort: '[PLZ Ort]',
-    telefon: '',                // optional, z. B. '+49 123 456789' – leer lassen = wird nicht angezeigt
-    // Wenn du unter 18 bist: Name eines Elternteils, der mitverantwortlich ist (gleiche Adresse).
-    // Leer lassen '' = wird nicht angezeigt.
-    elternteil: '[Vorname Nachname eines Elternteils]',
-  },
+  // Steht klein unten in der Fußzeile. Jeder Text in '…' ist ein eigener Absatz.
+  impressum: [
+    'Dies ist eine rein private Website ohne geschäftliche Zwecke.',
+    'Hier wird nichts verkauft, es gibt keine Werbung und ich verdiene mit dieser Seite kein Geld. Ich stelle mich nur kurz vor und zeige meine eigenen Programmier-Projekte.',
+    'Die Seite wird bei GitHub Pages gehostet. Ich selbst verwende keine Cookies und kein Tracking.',
+  ],
 
   kontakt: 'Ich freue mich immer, wenn sich andere Leute für meine Projekte interessieren. Schau dich ruhig ein bisschen auf meiner Seite um – und wenn du Fragen hast oder mir schreiben willst, meld dich einfach!',
 };
@@ -304,83 +287,17 @@ const PAGES = {
       <div class="about">
         <p style="margin-top:0">${esc(ICH.kontakt)}</p>
         <a class="btn" style="margin-top:4px" href="mailto:${esc(ICH.email.join('@'))}">✉️ ${esc(ICH.email.join('@'))}</a>
-        <a class="btn ghost" style="margin-top:4px" href="${esc(ICH.github)}">Mein GitHub-Profil</a>
-      </div>
-
-      ${ICH.impressumAnzeigen ? `<a class="legal-link" href="#impressum">⚖️ Impressum &amp; Datenschutz</a>` : ''}`;
+        <a class="btn ghost" style="margin-top:4px" href="${esc(ICH.github)}" target="_blank" rel="noopener">Mein GitHub-Profil</a>
+      </div>`;
   },
   impressum() {
-    if (!ICH.impressumAnzeigen) return PAGES.notfound();
-    const im = ICH.impressum;
-    // Platzhalter in [Klammern] rot markieren, damit man sie nicht vergisst
-    const f = v => v.includes('[') ? `<span class="fill">${esc(v)}</span>` : esc(v);
     const mail = esc(ICH.email.join('@'));
-    const adresse = `${f(im.strasse)}, ${f(im.ort)}`;
     return `<div class="legal">
-      <h1>⚖️ Impressum</h1>
-      <p class="lead">Angaben gemäß § 5 Digitale-Dienste-Gesetz (DDG)</p>
-
-      <h2>Anbieter</h2>
-      <div class="about"><p>${f(im.name)}<br>${f(im.strasse)}<br>${f(im.ort)}<br>Deutschland</p></div>
-
-      <h2>Kontakt</h2>
-      <div class="about"><p>E-Mail: <a href="mailto:${mail}">${mail}</a>${im.telefon ? `<br>Telefon: ${esc(im.telefon)}` : ''}</p></div>
-
-      <h2>Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV</h2>
-      <div class="about"><p>${f(im.name)}${im.elternteil ? `<br>${f(im.elternteil)} (erziehungsberechtigt)` : ''}<br>${adresse}</p></div>
-
-      <h2>Haftungsausschluss</h2>
-      <h3>Haftung für Inhalte</h3>
-      <p>Die Inhalte dieser Seite wurden mit größter Sorgfalt erstellt. Für die Richtigkeit, Vollständigkeit und Aktualität
-         der Inhalte kann ich jedoch keine Gewähr übernehmen. Als Diensteanbieter bin ich gemäß § 7 Abs. 1 DDG für eigene
-         Inhalte auf diesen Seiten nach den allgemeinen Gesetzen verantwortlich. Nach §§ 8 bis 10 DDG bin ich jedoch nicht
-         verpflichtet, übermittelte oder gespeicherte fremde Informationen zu überwachen oder nach Umständen zu forschen,
-         die auf eine rechtswidrige Tätigkeit hinweisen. Sobald mir Rechtsverletzungen bekannt werden, entferne ich die
-         entsprechenden Inhalte umgehend.</p>
-      <h3>Haftung für Links</h3>
-      <p>Diese Seite enthält Links zu externen Websites Dritter (z. B. GitHub), auf deren Inhalte ich keinen Einfluss habe.
-         Für die Inhalte der verlinkten Seiten ist stets der jeweilige Anbieter oder Betreiber verantwortlich. Zum Zeitpunkt
-         der Verlinkung waren keine Rechtsverstöße erkennbar. Werden mir Rechtsverletzungen bekannt, entferne ich solche
-         Links umgehend.</p>
-      <h3>Urheberrecht</h3>
-      <p>Die von mir erstellten Inhalte und Programme auf dieser Seite unterliegen dem deutschen Urheberrecht. Eine
-         Vervielfältigung, Bearbeitung oder Verbreitung außerhalb der Grenzen des Urheberrechts bedarf meiner vorherigen
-         Zustimmung, soweit im jeweiligen Code-Projekt auf GitHub keine andere Lizenz angegeben ist.</p>
-
-      <h1 style="margin-top:56px">🔒 Datenschutz</h1>
-      <p class="lead">Informationen nach Art. 13 Datenschutz-Grundverordnung (DSGVO)</p>
-
-      <h2>Verantwortlicher</h2>
-      <p>Verantwortlich für die Datenverarbeitung auf dieser Website ist ${f(im.name)}${im.elternteil ? ` (gemeinsam mit ${f(im.elternteil)})` : ''},
-         ${adresse}, E-Mail: <a href="mailto:${mail}">${mail}</a>.</p>
-
-      <h2>Hosting bei GitHub Pages</h2>
-      <p>Diese Website und meine Projekte (z. B. der Tipplerner) werden bei GitHub Pages gehostet, einem Dienst der
-         GitHub, Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, USA. Beim Aufruf der Seiten verarbeitet
-         GitHub technisch notwendige Daten, insbesondere deine IP-Adresse, Datum und Uhrzeit des Zugriffs sowie Angaben
-         zu Browser und Betriebssystem (Server-Logfiles). Das ist nötig, damit die Seite ausgeliefert und sicher betrieben
-         werden kann. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an einer stabilen und sicheren
-         Bereitstellung der Website). Dabei können Daten in die USA übermittelt werden; GitHub ist nach dem EU-US Data
-         Privacy Framework zertifiziert. Mehr dazu in der
-         <a href="https://docs.github.com/de/site-policy/privacy-policies/github-general-privacy-statement">Datenschutzerklärung von GitHub</a>.</p>
-      <p>Mein Profilbild wird direkt von github.com geladen; auch dabei wird deine IP-Adresse an GitHub übertragen.</p>
-
-      <h2>Keine Cookies, kein Tracking</h2>
-      <p>Ich verwende keine Cookies, keine Analyse- oder Tracking-Tools und keine Werbung. Einige Projekte (z. B. der
-         Tipplerner) speichern Einstellungen nur lokal in deinem Browser (Local Storage). Diese Daten bleiben auf deinem
-         Gerät, werden nicht an mich übertragen und können jederzeit über die Browser-Einstellungen gelöscht werden.</p>
-
-      <h2>Kontakt per E-Mail</h2>
-      <p>Wenn du mir eine E-Mail schreibst, verwende ich deine Angaben (E-Mail-Adresse, Inhalt der Nachricht) nur, um dir
-         zu antworten. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO. Die Nachricht wird gelöscht, sobald sie nicht mehr
-         gebraucht wird.</p>
-
-      <h2>Deine Rechte</h2>
-      <p>Du hast das Recht auf Auskunft (Art. 15 DSGVO), Berichtigung (Art. 16), Löschung (Art. 17), Einschränkung der
-         Verarbeitung (Art. 18), Datenübertragbarkeit (Art. 20) und Widerspruch (Art. 21). Außerdem kannst du dich bei
-         einer Datenschutz-Aufsichtsbehörde beschweren (Art. 77 DSGVO). Schreib mir dafür einfach eine E-Mail.</p>
-
-      <p><small>Stand: Oktober 2026</small></p>
+      <h1>Impressum</h1>
+      <div class="about">
+        ${ICH.impressum.map(t => `<p>${esc(t)}</p>`).join('')}
+        <p>Kontakt: <a href="mailto:${mail}">${mail}</a></p>
+      </div>
       <a class="btn" href="#home">← Zurück</a>
     </div>`;
   },
@@ -402,8 +319,8 @@ const PAGES = {
           <li><span class="tl-dot">${e}</span><span class="tl-date">${esc(d)}</span><span class="tl-text">${esc(t)}</span></li>`).join('')}
       </ol>` : ''}
       <div class="pbtns">
-        ${p.link ? `<a class="btn" href="${esc(p.link)}">▶ Austesten</a>` : ''}
-        ${p.code ? `<a class="btn ghost" href="${esc(p.code)}">💻 Code ansehen</a>` : ''}
+        ${p.link ? `<a class="btn" href="${esc(p.link)}" target="_blank" rel="noopener">▶ Austesten</a>` : ''}
+        ${p.code ? `<a class="btn ghost" href="${esc(p.code)}" target="_blank" rel="noopener">💻 Code ansehen</a>` : ''}
       </div>`;
   },
   notfound() {
@@ -441,7 +358,7 @@ window.addEventListener('hashchange', render);
 
 $('logo').textContent = ICH.name;
 $('footer').innerHTML = `© ${new Date().getFullYear()} ${esc(ICH.name)} · gemacht mit ❤️ und GitHub Pages`
-  + (ICH.impressumAnzeigen ? ` · <a href="#impressum">Impressum &amp; Datenschutz</a>` : '');
+  + `<a class="imp" href="#impressum">Impressum</a>`;
 buildMenu();
 render();
 </script>
