@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>rafchesss</title>
+<style>
+  :root {
+    --bg: #0f1220; --bg2: #161a2e; --card: #1c2140; --card2: #232a50; --text: #e8ebff; --muted: #9aa3cc;
+    --accent: #6c8cff; --accent2: #b06cff; --border: #2c3460; --ok: #4cd29a;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; font-family: system-ui, "Segoe UI", sans-serif; color: var(--text); background: var(--bg);
+    background-image: radial-gradient(circle at 15% 0%, #2a2f6b55, transparent 45%), radial-gradient(circle at 90% 20%, #5b2a6b44, transparent 40%);
+    min-height: 100vh;
+  }
+  a { color: inherit; }
+
+  /* ---------- Navigation ---------- */
+  nav {
+    position: sticky; top: 0; z-index: 10; backdrop-filter: blur(10px);
+    background: #0f1220cc; border-bottom: 1px solid var(--border);
+  }
+  .nav-inner { max-width: 1000px; margin: 0 auto; padding: 0 16px; display: flex; align-items: center; gap: 6px; height: 60px; }
+  .logo { font-weight: 800; font-size: 1.2rem; text-decoration: none; margin-right: auto;
+    background: linear-gradient(90deg, var(--accent), var(--accent2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .nav-link, .drop-btn {
+    font: inherit; color: var(--muted); background: none; border: 0; cursor: pointer; text-decoration: none;
+    padding: 8px 12px; border-radius: 8px; font-weight: 600;
+  }
+  .nav-link:hover, .drop-btn:hover, .nav-link.active, .drop-btn.active { color: var(--text); background: var(--card); }
+  .dropdown { position: relative; }
+  .drop-btn .arrow { display: inline-block; transition: transform .2s; font-size: .8em; }
+  .dropdown.open .arrow { transform: rotate(180deg); }
+  .drop-menu {
+    position: absolute; right: 0; top: calc(100% + 8px); min-width: 260px; padding: 6px;
+    background: var(--card); border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 12px 40px #0008;
+    display: none;
+  }
+  .dropdown.open .drop-menu { display: block; }
+  .drop-menu a { display: flex; gap: 10px; align-items: center; padding: 10px 12px; border-radius: 8px; text-decoration: none; }
+  .drop-menu a:hover { background: var(--card2); }
+  .drop-menu .emoji { font-size: 1.4rem; }
+  .drop-menu small { display: block; color: var(--muted); }
+  .drop-menu hr { border: 0; border-top: 1px solid var(--border); margin: 6px 4px; }
+  .drop-menu .soon { padding: 10px 12px; color: var(--muted); font-style: italic; }
+
+  /* ---------- Inhalt ---------- */
+  main { max-width: 1000px; margin: 0 auto; padding: 32px 16px 64px; }
+  .page { animation: fade .3s ease; }
+  @keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  h1 { font-size: clamp(2rem, 6vw, 3.2rem); margin: 0 0 8px; line-height: 1.1; }
+  h2 { margin: 36px 0 14px; font-size: 1.3rem; }
+  .gradient { background: linear-gradient(90deg, var(--accent), var(--accent2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .lead { color: var(--muted); font-size: 1.15rem; margin: 0; max-width: 620px; line-height: 1.5; }
+  .hero { padding: 24px 0 8px; }
+  .greeting { color: var(--accent); font-weight: 700; margin-bottom: 6px; }
+
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-top: 28px; }
+  .tile { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px; }
+  .tile .num { font-size: 2rem; font-weight: 800; }
+  .tile .lbl { color: var(--muted); font-size: .9rem; }
+
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+  .card {
+    display: block; text-decoration: none; background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+    padding: 20px; transition: transform .15s, border-color .15s;
+  }
+  .card:hover { transform: translateY(-3px); border-color: var(--accent); }
+  .card .emoji { font-size: 2.4rem; }
+  .card h3 { margin: 10px 0 6px; font-size: 1.2rem; }
+  .card p { margin: 0; color: var(--muted); line-height: 1.45; }
+  .card.placeholder { border-style: dashed; display: flex; align-items: center; justify-content: center; color: var(--muted); min-height: 150px; text-align: center; }
+  .card.placeholder:hover { transform: none; border-color: var(--border); }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+  .tag { font-size: .8rem; padding: 3px 9px; border-radius: 99px; background: var(--card2); color: var(--muted); }
+
+  .ptitle { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .pemoji { font-size: 1.1em; }
+  .pshort { font-size: 1.25rem; font-weight: 600; color: var(--accent); margin: 4px 0 22px; }
+  .pdesc { color: var(--text); font-size: 1.08rem; line-height: 1.65; max-width: 720px; margin: 0;
+    background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 20px 22px; }
+  .pdesc p { margin: 0 0 14px; } .pdesc p:last-child { margin-bottom: 0; }
+  .timeline { list-style: none; margin: 0; padding: 0 0 0 4px; position: relative; }
+  .timeline::before { content: ''; position: absolute; left: 25px; top: 10px; bottom: 10px; width: 3px; border-radius: 3px;
+    background: linear-gradient(var(--accent), var(--accent2)); }
+  .timeline li { position: relative; display: flex; align-items: center; gap: 16px; padding: 8px 0; }
+  .tl-dot { position: relative; z-index: 1; flex: 0 0 auto; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem; background: var(--card); border: 2px solid var(--accent); }
+  .tl-date { color: var(--muted); font-variant-numeric: tabular-nums; min-width: 92px; }
+  .tl-text { font-weight: 700; font-size: 1.05rem; }
+  .pbtns { margin-top: 28px; display: flex; gap: 10px; flex-wrap: wrap; }
+  .pbtns .btn { margin: 0; }
+  .project-head { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; }
+  .project-head .emoji { font-size: 4rem; }
+  .btn {
+    display: inline-block; text-decoration: none; font-weight: 700; padding: 12px 22px; border-radius: 12px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2)); color: #fff; margin-top: 20px;
+  }
+  .btn:hover { filter: brightness(1.1); }
+  .btn.ghost { background: var(--card); border: 1px solid var(--border); color: var(--text); margin-left: 8px; }
+  .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+  .feature { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px; }
+  .feature b { display: block; margin-bottom: 4px; }
+  .feature span { color: var(--muted); font-size: .95rem; line-height: 1.4; }
+  .about { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; line-height: 1.6; font-size: 1.05rem; }
+  .me { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
+  .avatar {
+    flex: 0 0 auto; overflow: hidden; border: 3px solid var(--accent);
+    width: 120px; height: 120px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 3rem;
+    background: linear-gradient(135deg, var(--accent), var(--accent2)); box-shadow: 0 0 40px #6c8cff55;
+  }
+  .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+  .avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .jf { display: grid; grid-template-columns: auto 1fr; gap: 28px; align-items: center; }
+  .jf p { margin: 0 0 10px; }
+  .jf-stats { display: flex; flex-direction: column; gap: 14px; text-align: center; }
+  .jf-stats .num { font-size: 2.8rem; font-weight: 800; line-height: 1; }
+  .jf-stats .lbl { color: var(--muted); font-size: .9rem; }
+  .hobby .he { font-size: 2.2rem; margin-bottom: 6px; }
+  .hobby b { font-size: 1.15rem; }
+  @media (max-width: 560px) { .jf { grid-template-columns: 1fr; } .jf-stats { flex-direction: row; justify-content: space-around; } }
+  .fact { display: flex; gap: 12px; align-items: center; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 14px 16px; }
+  .fe { font-size: 1.8rem; }
+  .fk { color: var(--muted); font-size: .85rem; }
+  .fv { font-weight: 700; }
+  .fv.empty { color: var(--muted); font-weight: 400; font-style: italic; }
+  .tag.big { font-size: 1rem; padding: 6px 14px; }
+
+  footer { text-align: center; color: var(--muted); font-size: .85rem; padding: 24px 16px 40px; }
+  footer a { color: var(--text); font-weight: 700; }
+
+  .legal-link { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 40px; padding: 16px;
+    background: var(--card); border: 1px solid var(--border); border-radius: 16px; text-decoration: none; font-weight: 700; font-size: 1.1rem; }
+  .legal-link:hover { border-color: var(--accent); }
+  .legal { max-width: 760px; }
+  .legal h2 { margin-top: 32px; }
+  .legal h3 { margin: 18px 0 6px; font-size: 1.05rem; }
+  .legal p { line-height: 1.6; }
+  .legal a { color: var(--accent); }
+  .legal .about p { margin: 0; }
+  .legal .fill { color: #ff7b7b; font-weight: 700; }
+  .legal small { color: var(--muted); }
+
+  @media (max-width: 560px) {
+    .nav-link, .drop-btn { padding: 8px 8px; }
+    .drop-menu { position: fixed; left: 12px; right: 12px; top: 64px; min-width: 0; }
+    .btn.ghost { margin-left: 0; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a class="logo" href="#home" id="logo"></a>
+    <a class="nav-link" href="#home" data-page="home">🏠 Über mich</a>
+    <div class="dropdown" id="dropdown">
+      <button class="drop-btn" id="dropBtn" aria-haspopup="true" aria-expanded="false">🚀 Projekte <span class="arrow">▾</span></button>
+      <div class="drop-menu" id="dropMenu"></div>
+    </div>
+  </div>
+</nav>
+
+<main id="app"></main>
+
+<footer id="footer"></footer>
+
+<script>
+/* =====================================================================
+   HIER KANNST DU DEINE SEITE ÄNDERN – einfach den Text zwischen den
+   Anführungszeichen '…' austauschen. Den Rest musst du nicht anfassen.
+   ===================================================================== */
+
+const ICH = {
+  name: 'rafchesss',            // steht oben links im Menü
+  vorname: 'Rafael',
+  profilbild: 'https://github.com/rafchesss-blip.png?size=240',
+  github: 'https://github.com/rafchesss-blip',
+  // E-Mail in zwei Teilen, damit Spam-Programme sie schwerer finden
+  email: ['fuerfragen.rafael', 'gmail.com'],
+
+  intro: 'Schön, dass du auf meiner Website vorbeischaust! Ich bin Rafael, ein junger Programmierer, der einfach extrem viel Spaß am Coden, Ausprobieren und Tüfteln hat.',
+
+  ueberMich: 'Schon seit einer Weile dreht sich bei mir fast alles um Technik, Programme und logische Rätsel. Für mich ist Programmieren wie ein Baukasten, mit dem man fast jede Idee, die man im Kopf hat, am Computer wirklich bauen kann.',
+
+  jugendForscht: {
+    teilnahmen: 4,
+    landeswettbewerb: 3,
+    text: [
+      'Ein riesiges Thema für mich ist der Wettbewerb Jugend forscht. Ich war bisher schon vier Mal dabei – und habe es sogar drei Mal in den Landeswettbewerb geschafft!',
+      'Es macht mir einfach super viel Spaß, mir eigene Projekte zu überlegen, monatelang daran zu tüfteln und am Ende der Jury zu zeigen, was ich gebaut habe. Durch Jugend forscht habe ich mega viel darüber gelernt, wie man an schweren Problemen dranbleibt und eigene Ideen von Anfang bis Ende durchzieht.',
+    ],
+  },
+
+  freizeit: 'Wenn ich am Computer sitze, schreibe ich gerne eigenen Code, probiere neue Sprachen aus oder arbeite an kleinen Projekten. Aber ich hocke natürlich nicht nur vor dem Bildschirm!',
+
+  // Hobbys: [Emoji, Titel, Text]
+  hobbys: [
+    ['♟️', 'Schach', 'Schach spiele ich richtig gerne – und gebe mein Wissen auch weiter, indem ich jüngeren Kindern zeige, wie das Spiel funktioniert und wie man taktisch klug zieht. Genau wie beim Programmieren muss man beim Schach vorausschauen, logisch nachdenken und sich gute Strategien überlegen.'],
+    ['🎻', 'Geige & Klavier', 'Ich spiele zwei Instrumente! Die Musik ist für mich der perfekte Ausgleich zum Coden. Es macht einfach Spaß, neue Stücke zu lernen und zwischendurch mal ganz was anderes zu machen als nur Logik und Zahlen.'],
+  ],
+
+  // ---------- IMPRESSUM ----------
+  // Zurzeit ausgeschaltet. Zum Einschalten auf true setzen – dann erscheint
+  // unten auf „Über mich“ und in der Fußzeile ein Link zum Impressum.
+  impressumAnzeigen: false,
+  // Alles in [eckigen Klammern] MUSST du durch echte Angaben ersetzen –
+  // solange etwas in [Klammern] steht, wird es im Impressum rot angezeigt.
+  // Die Adresse muss eine echte Post-Adresse sein (kein Postfach).
+  impressum: {
+    name: 'Rafael [NACHNAME]',
+    strasse: '[Straße Hausnummer]',
+    ort: '[PLZ Ort]',
+    telefon: '',                // optional, z. B. '+49 123 456789' – leer lassen = wird nicht angezeigt
+    // Wenn du unter 18 bist: Name eines Elternteils, der mitverantwortlich ist (gleiche Adresse).
+    // Leer lassen '' = wird nicht angezeigt.
+    elternteil: '[Vorname Nachname eines Elternteils]',
+  },
+
+  kontakt: 'Ich freue mich immer, wenn sich andere Leute für meine Projekte interessieren. Schau dich ruhig ein bisschen auf meiner Seite um – und wenn du Fragen hast oder mir schreiben willst, meld dich einfach!',
+};
+
+// So ist jedes Projekt aufgebaut:
+//   name, emoji, kurz (ca. 5 Wörter), beschreibung (lang),
+//   timeline: [Datum, Emoji, 2–3 Wörter], link (zum Austesten), code (GitHub)
+const PROJEKTE = [
+  {
+    id: 'tipplerner',
+    name: 'Tipplerner',
+    emoji: '⌨️',
+    kurz: '10-Finger-Tippen spielerisch lernen',
+    // Lange Beschreibung: jeder Text in '…' ist ein eigener Absatz
+    beschreibung: [
+      'Ich wollte einfach mal etwas Neues lernen – und weil ich das 10-Finger-Tippen noch nicht konnte, habe ich mir genau das ausgesucht. Wer blind mit allen zehn Fingern tippt, schreibt nicht nur viel schneller, sondern muss auch nicht ständig auf die Tastatur schauen. Gerade beim Programmieren ist das super praktisch!',
+      'Im Internet gibt es zwar viele Websites zum Tippen-Lernen, aber die meisten sind entweder ziemlich schlecht gemacht oder kosten Geld. Deshalb habe ich beschlossen: Ich baue mir mein eigenes Programm – kostenlos, ohne Werbung und genau so, wie ich es mir vorstelle.',
+      'Besonders wichtig war mir, dass man selbst auswählen kann, was man üben möchte. Man gibt einfach die Tasten ein, die man gerade lernt, und der Tipplerner sucht dazu passende echte deutsche Wörter heraus. Gibt es mit diesen Tasten nicht genug Wörter, bekommt man zufällige Buchstabenfolgen. Am Ende sieht man, wie viele Wörter pro Minute (WPM) man geschafft hat und wie viel Prozent richtig waren.',
+      'Danach kam mir die Idee, Spiele einzubauen, damit das Üben mehr Spaß macht: Buchstaben-Ballons, die auf spitze Spieße zufallen, Plattformen, die langsam in der Lava versinken, ein Autorennen gegen Computer-Autos oder sogar gegen den eigenen Rekord – und ein brennendes Seil, an dem man bis ins Weltall zur ISS klettert.',
+      'Als ich die Spiele dann selbst ausprobiert habe, habe ich gemerkt, dass sie wirklich effektiv sind: Man will unbedingt weiterkommen und tippt dabei ganz automatisch schneller und genauer. So lernt man fast nebenbei – und hat trotzdem Spaß dabei.',
+    ],
+    timeline: [
+      ['02.10.2026', '⌨️', 'Training gebaut'],
+      ['03.10.2026', '🎈', 'Ballon-Spiel'],
+      ['03.10.2026', '🌋', 'Lava-Spiel'],
+      ['03.10.2026', '🏎️', 'Autorennen'],
+      ['03.10.2026', '🧗', 'Seil-Klettern'],
+      ['03.10.2026', '🌐', 'Online gestellt'],
+    ],
+    link: 'https://rafchesss-blip.github.io/tipplerner/',
+    code: 'https://github.com/rafchesss-blip/tipplerner',
+  },
+  // Neues Projekt? Einfach den Block oben kopieren und hier einfügen.
+];
+
+/* ===================================================================== */
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+function projectCard(p) {
+  return `<a class="card" href="#projekt/${p.id}">
+    <div class="emoji">${p.emoji}</div>
+    <h3>${esc(p.name)}</h3>
+    <p>${esc(p.kurz)}</p>
+    <div class="tags">${(p.tags || []).map(t => `<span class="tag">${esc(t)}</span>`).join('')}</div>
+  </a>`;
+}
+
+const PAGES = {
+  home() {
+    const jf = ICH.jugendForscht;
+    return `
+      <section class="hero">
+        <div class="me">
+          <div class="avatar"><img src="${esc(ICH.profilbild)}" alt="Profilbild von ${esc(ICH.vorname)}"
+               onerror="this.parentNode.textContent='😎'"></div>
+          <div>
+            <h1>Hi, ich bin <span class="gradient">${esc(ICH.vorname)}</span>! 👋</h1>
+            <p class="lead">${esc(ICH.intro)}</p>
+          </div>
+        </div>
+      </section>
+
+      <div class="about"><p style="margin:0">${esc(ICH.ueberMich)}</p></div>
+
+      <h2>🔬 Jugend forscht</h2>
+      <div class="about jf">
+        <div class="jf-stats">
+          <div><div class="num gradient">${jf.teilnahmen}×</div><div class="lbl">dabei gewesen</div></div>
+          <div><div class="num gradient">${jf.landeswettbewerb}×</div><div class="lbl">im Landeswettbewerb</div></div>
+        </div>
+        <div>${jf.text.map(t => `<p>${esc(t)}</p>`).join('')}</div>
+      </div>
+
+      <h2>🎯 Was ich in meiner Freizeit mache</h2>
+      <p class="lead" style="margin-bottom:16px">${esc(ICH.freizeit)}</p>
+      <div class="features">
+        ${ICH.hobbys.map(([e, t, d]) => `<div class="feature hobby"><div class="he">${e}</div><b>${esc(t)}</b><span>${esc(d)}</span></div>`).join('')}
+      </div>
+
+      <h2>✉️ Schreib mir gerne!</h2>
+      <div class="about">
+        <p style="margin-top:0">${esc(ICH.kontakt)}</p>
+        <a class="btn" style="margin-top:4px" href="mailto:${esc(ICH.email.join('@'))}">✉️ ${esc(ICH.email.join('@'))}</a>
+        <a class="btn ghost" style="margin-top:4px" href="${esc(ICH.github)}">Mein GitHub-Profil</a>
+      </div>
+
+      ${ICH.impressumAnzeigen ? `<a class="legal-link" href="#impressum">⚖️ Impressum &amp; Datenschutz</a>` : ''}`;
+  },
+  impressum() {
+    if (!ICH.impressumAnzeigen) return PAGES.notfound();
+    const im = ICH.impressum;
+    // Platzhalter in [Klammern] rot markieren, damit man sie nicht vergisst
+    const f = v => v.includes('[') ? `<span class="fill">${esc(v)}</span>` : esc(v);
+    const mail = esc(ICH.email.join('@'));
+    const adresse = `${f(im.strasse)}, ${f(im.ort)}`;
+    return `<div class="legal">
+      <h1>⚖️ Impressum</h1>
+      <p class="lead">Angaben gemäß § 5 Digitale-Dienste-Gesetz (DDG)</p>
+
+      <h2>Anbieter</h2>
+      <div class="about"><p>${f(im.name)}<br>${f(im.strasse)}<br>${f(im.ort)}<br>Deutschland</p></div>
+
+      <h2>Kontakt</h2>
+      <div class="about"><p>E-Mail: <a href="mailto:${mail}">${mail}</a>${im.telefon ? `<br>Telefon: ${esc(im.telefon)}` : ''}</p></div>
+
+      <h2>Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV</h2>
+      <div class="about"><p>${f(im.name)}${im.elternteil ? `<br>${f(im.elternteil)} (erziehungsberechtigt)` : ''}<br>${adresse}</p></div>
+
+      <h2>Haftungsausschluss</h2>
+      <h3>Haftung für Inhalte</h3>
+      <p>Die Inhalte dieser Seite wurden mit größter Sorgfalt erstellt. Für die Richtigkeit, Vollständigkeit und Aktualität
+         der Inhalte kann ich jedoch keine Gewähr übernehmen. Als Diensteanbieter bin ich gemäß § 7 Abs. 1 DDG für eigene
+         Inhalte auf diesen Seiten nach den allgemeinen Gesetzen verantwortlich. Nach §§ 8 bis 10 DDG bin ich jedoch nicht
+         verpflichtet, übermittelte oder gespeicherte fremde Informationen zu überwachen oder nach Umständen zu forschen,
+         die auf eine rechtswidrige Tätigkeit hinweisen. Sobald mir Rechtsverletzungen bekannt werden, entferne ich die
+         entsprechenden Inhalte umgehend.</p>
+      <h3>Haftung für Links</h3>
+      <p>Diese Seite enthält Links zu externen Websites Dritter (z. B. GitHub), auf deren Inhalte ich keinen Einfluss habe.
+         Für die Inhalte der verlinkten Seiten ist stets der jeweilige Anbieter oder Betreiber verantwortlich. Zum Zeitpunkt
+         der Verlinkung waren keine Rechtsverstöße erkennbar. Werden mir Rechtsverletzungen bekannt, entferne ich solche
+         Links umgehend.</p>
+      <h3>Urheberrecht</h3>
+      <p>Die von mir erstellten Inhalte und Programme auf dieser Seite unterliegen dem deutschen Urheberrecht. Eine
+         Vervielfältigung, Bearbeitung oder Verbreitung außerhalb der Grenzen des Urheberrechts bedarf meiner vorherigen
+         Zustimmung, soweit im jeweiligen Code-Projekt auf GitHub keine andere Lizenz angegeben ist.</p>
+
+      <h1 style="margin-top:56px">🔒 Datenschutz</h1>
+      <p class="lead">Informationen nach Art. 13 Datenschutz-Grundverordnung (DSGVO)</p>
+
+      <h2>Verantwortlicher</h2>
+      <p>Verantwortlich für die Datenverarbeitung auf dieser Website ist ${f(im.name)}${im.elternteil ? ` (gemeinsam mit ${f(im.elternteil)})` : ''},
+         ${adresse}, E-Mail: <a href="mailto:${mail}">${mail}</a>.</p>
+
+      <h2>Hosting bei GitHub Pages</h2>
+      <p>Diese Website und meine Projekte (z. B. der Tipplerner) werden bei GitHub Pages gehostet, einem Dienst der
+         GitHub, Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, USA. Beim Aufruf der Seiten verarbeitet
+         GitHub technisch notwendige Daten, insbesondere deine IP-Adresse, Datum und Uhrzeit des Zugriffs sowie Angaben
+         zu Browser und Betriebssystem (Server-Logfiles). Das ist nötig, damit die Seite ausgeliefert und sicher betrieben
+         werden kann. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an einer stabilen und sicheren
+         Bereitstellung der Website). Dabei können Daten in die USA übermittelt werden; GitHub ist nach dem EU-US Data
+         Privacy Framework zertifiziert. Mehr dazu in der
+         <a href="https://docs.github.com/de/site-policy/privacy-policies/github-general-privacy-statement">Datenschutzerklärung von GitHub</a>.</p>
+      <p>Mein Profilbild wird direkt von github.com geladen; auch dabei wird deine IP-Adresse an GitHub übertragen.</p>
+
+      <h2>Keine Cookies, kein Tracking</h2>
+      <p>Ich verwende keine Cookies, keine Analyse- oder Tracking-Tools und keine Werbung. Einige Projekte (z. B. der
+         Tipplerner) speichern Einstellungen nur lokal in deinem Browser (Local Storage). Diese Daten bleiben auf deinem
+         Gerät, werden nicht an mich übertragen und können jederzeit über die Browser-Einstellungen gelöscht werden.</p>
+
+      <h2>Kontakt per E-Mail</h2>
+      <p>Wenn du mir eine E-Mail schreibst, verwende ich deine Angaben (E-Mail-Adresse, Inhalt der Nachricht) nur, um dir
+         zu antworten. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO. Die Nachricht wird gelöscht, sobald sie nicht mehr
+         gebraucht wird.</p>
+
+      <h2>Deine Rechte</h2>
+      <p>Du hast das Recht auf Auskunft (Art. 15 DSGVO), Berichtigung (Art. 16), Löschung (Art. 17), Einschränkung der
+         Verarbeitung (Art. 18), Datenübertragbarkeit (Art. 20) und Widerspruch (Art. 21). Außerdem kannst du dich bei
+         einer Datenschutz-Aufsichtsbehörde beschweren (Art. 77 DSGVO). Schreib mir dafür einfach eine E-Mail.</p>
+
+      <p><small>Stand: Oktober 2026</small></p>
+      <a class="btn" href="#home">← Zurück</a>
+    </div>`;
+  },
+  projekte() {
+    return `<h1>🚀 Projekte</h1><p class="lead">Alles, was ich bisher gebaut habe.</p><h2></h2>
+      <div class="cards">${PROJEKTE.map(projectCard).join('')}<div class="card placeholder">🛠️ Nächstes Projekt<br>kommt bald …</div></div>`;
+  },
+  projekt(id) {
+    const p = PROJEKTE.find(x => x.id === id);
+    if (!p) return PAGES.notfound();
+    return `
+      <h1 class="ptitle">${esc(p.name)} <span class="pemoji">${p.emoji}</span></h1>
+      <p class="pshort">${esc(p.kurz)}</p>
+      <div class="pdesc">${[].concat(p.beschreibung).map(t => `<p>${esc(t)}</p>`).join('')}</div>
+      ${p.timeline && p.timeline.length ? `
+      <h2>🗓️ Timeline</h2>
+      <ol class="timeline">
+        ${p.timeline.map(([d, e, t]) => `
+          <li><span class="tl-dot">${e}</span><span class="tl-date">${esc(d)}</span><span class="tl-text">${esc(t)}</span></li>`).join('')}
+      </ol>` : ''}
+      <div class="pbtns">
+        ${p.link ? `<a class="btn" href="${esc(p.link)}">▶ Austesten</a>` : ''}
+        ${p.code ? `<a class="btn ghost" href="${esc(p.code)}">💻 Code ansehen</a>` : ''}
+      </div>`;
+  },
+  notfound() {
+    return `<h1>🤔 Nicht gefunden</h1><p class="lead">Diese Seite gibt es nicht.</p><a class="btn" href="#home">Zurück zu Home</a>`;
+  },
+};
+
+function render() {
+  const [page, arg] = (location.hash.slice(1) || 'home').split('/');
+  const fn = PAGES[page] || PAGES.notfound;
+  $('app').innerHTML = `<div class="page">${fn(arg)}</div>`;
+  document.querySelectorAll('.nav-link').forEach(a => a.classList.toggle('active', a.dataset.page === page));
+  $('dropBtn').classList.toggle('active', page === 'projekt' || page === 'projekte');
+  closeMenu();
+  window.scrollTo(0, 0);
+  const p = page === 'projekt' && PROJEKTE.find(x => x.id === arg);
+  document.title = p ? `${p.name} – ${ICH.name}` : page === 'impressum' ? `Impressum – ${ICH.name}` : ICH.name;
+}
+
+function buildMenu() {
+  $('dropMenu').innerHTML = PROJEKTE.map(p => `
+    <a href="#projekt/${p.id}"><span class="emoji">${p.emoji}</span><span>${esc(p.name)}<small>${esc(p.kurz)}</small></span></a>`).join('')
+    + `<div class="soon">🛠️ Mehr kommt bald …</div><hr><a href="#projekte"><span class="emoji">📂</span><span>Alle Projekte</span></a>`;
+}
+
+function closeMenu() { $('dropdown').classList.remove('open'); $('dropBtn').setAttribute('aria-expanded', 'false'); }
+$('dropBtn').addEventListener('click', e => {
+  e.stopPropagation();
+  const open = $('dropdown').classList.toggle('open');
+  $('dropBtn').setAttribute('aria-expanded', open);
+});
+document.addEventListener('click', e => { if (!$('dropdown').contains(e.target)) closeMenu(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
+window.addEventListener('hashchange', render);
+
+$('logo').textContent = ICH.name;
+$('footer').innerHTML = `© ${new Date().getFullYear()} ${esc(ICH.name)} · gemacht mit ❤️ und GitHub Pages`
+  + (ICH.impressumAnzeigen ? ` · <a href="#impressum">Impressum &amp; Datenschutz</a>` : '');
+buildMenu();
+render();
+</script>
+</body>
+</html>
