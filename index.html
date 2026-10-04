@@ -234,6 +234,33 @@ const PROJEKTE = [
     link: 'https://rafchesss-blip.github.io/tipplerner/',
     code: 'https://github.com/rafchesss-blip/tipplerner',
   },
+  {
+    id: 'meldezaehler',
+    name: 'Meldezähler',
+    emoji: '✋',
+    kurz: 'Eine Uhr, die Meldungen zählt',
+    beschreibung: [
+      'In der Schule passiert es manchmal, dass Lehrer einen Schüler, der sich meldet, einfach nicht bemerken. Vielleicht sitzt man weiter hinten, vielleicht melden sich gerade viele gleichzeitig – und irgendwann nimmt man den Arm enttäuscht wieder runter. Am Ende weiß niemand, wie oft man sich eigentlich gemeldet hat. Da dachte ich mir: Ich baue einen Meldezähler!',
+      'Die Idee: Ein Gerät am Handgelenk erkennt automatisch, wenn man den Arm hebt, und zählt jede Meldung mit. So sieht man genau, wie oft man sich in jeder Stunde und in jedem Fach gemeldet hat – und wie oft man auch drangenommen wurde.',
+      'Zuerst habe ich einen einfachen ESP32-Mikrocontroller mit einem Bewegungssensor genommen, der Beschleunigung und Drehung misst. Damit habe ich ganz viele Meldungen und andere Bewegungen aufgenommen und am PC eine künstliche Intelligenz trainiert. Die lernt, eine echte Meldung von anderen Bewegungen zu unterscheiden – zum Beispiel vom Kopfkratzen oder wenn man etwas vom Boden aufhebt. Damit jeder das Armband tragen kann, stellt es sich am Anfang auf die Person ein.',
+      'Danach habe ich mir eine fertige ESP32-Uhr gekauft, in der schon alles drin ist: ein Touch-Display, ein Bewegungssensor, ein Akku und sogar ein Vibrationsmotor. Die Software dafür programmiere ich selbst. Die Erkennung läuft jetzt komplett auf der Uhr – inzwischen mit einem kleinen neuronalen Netz, das in meinen Tests rund 93 % der Bewegungen richtig erkennt. Bei jeder erkannten Meldung vibriert die Uhr kurz.',
+      'Dazu gibt es eine eigene Handy-App, die sich per Bluetooth mit der Uhr verbindet, die Uhrzeit und den Stundenplan überträgt und Statistiken anzeigt. Auf der Uhr gibt es außerdem Schul-Zifferblätter mit der aktuellen Stunde, einen Timer, eine Stoppuhr und eine Stummschaltung während des Unterrichts.',
+      'Gerade beschäftige ich mich mit dem Akku: In Energietests messe ich, wie viel Strom das Display, der Sensor und der Rest der Uhr verbrauchen – damit der Meldezähler einen ganzen Schultag durchhält.',
+    ],
+    timeline: [
+      ['20.09.2026', '💡', 'Projektstart'],
+      ['20.09.2026', '📡', 'ESP32 mit Bewegungssensor'],
+      ['20.09.2026', '🧠', 'KI trainiert'],
+      ['26.09.2026', '⌚', 'Umzug auf Uhr'],
+      ['26.09.2026', '📱', 'Handy-App'],
+      ['27.09.2026', '🤖', 'Neuronales Netz'],
+      ['01.10.2026', '🔋', 'Stromsparmodus'],
+      ['02.10.2026', '🎨', 'Neue Oberfläche'],
+      ['03.10.2026', '⚡', 'Energietests'],
+    ],
+    link: '',   // kein Online-Test, weil es auf der Uhr läuft
+    code: 'https://github.com/rafchesss-blip/meldezaehler',
+  },
   // Neues Projekt? Einfach den Block oben kopieren und hier einfügen.
 ];
 
