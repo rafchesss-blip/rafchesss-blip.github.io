@@ -93,6 +93,8 @@
   .tl-text { font-weight: 700; font-size: 1.05rem; }
   .pbtns { margin-top: 28px; display: flex; gap: 10px; flex-wrap: wrap; }
   .pbtns .btn { margin: 0; }
+  .star-hint { color: var(--muted); margin: 12px 0 0; font-size: .95rem; }
+  .star-hint a { color: var(--accent); font-weight: 600; }
   .project-head { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; }
   .project-head .emoji { font-size: 4rem; }
   .btn {
@@ -128,6 +130,37 @@
   .fv { font-weight: 700; }
   .fv.empty { color: var(--muted); font-weight: 400; font-style: italic; }
   .tag.big { font-size: 1rem; padding: 6px 14px; }
+
+  /* ---------- Easter Egg: Schachrätsel ---------- */
+  .hobby .he.egg { display: inline-block; cursor: pointer; transition: transform .2s; }
+  .hobby .he.egg:hover { transform: rotate(-12deg) scale(1.1); }
+  .modal { position: fixed; inset: 0; z-index: 50; display: flex; align-items: center; justify-content: center;
+    padding: 16px; background: #000a; animation: fade .2s ease; }
+  .modal-box { position: relative; width: 100%; max-width: 420px; max-height: calc(100vh - 32px); overflow-y: auto;
+    background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 20px; box-shadow: 0 20px 60px #000c; }
+  .modal-box h3 { margin: 0 0 4px; font-size: 1.3rem; }
+  .modal-box .sub { margin: 0 0 14px; color: var(--muted); font-size: .9rem; }
+  .modal-close { position: absolute; top: 10px; right: 10px; font: inherit; font-size: 1.3rem; line-height: 1;
+    width: 36px; height: 36px; border-radius: 50%; border: 0; cursor: pointer; background: var(--card2); color: var(--text); }
+  .board { display: grid; grid-template-columns: repeat(8, 1fr); border-radius: 8px; overflow: hidden;
+    border: 3px solid var(--card2); user-select: none; }
+  .sq { position: relative; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; cursor: pointer;
+    font-size: clamp(1.6rem, 9vw, 2.4rem); line-height: 1; background: #b9c3e8; }
+  .sq.dark { background: #5c6aa8; }
+  .sq.last { box-shadow: inset 0 0 0 100px #ffd76a66; }
+  .sq.sel { box-shadow: inset 0 0 0 100px #6cffb666; }
+  .sq.hint::after { content: ''; position: absolute; width: 28%; height: 28%; border-radius: 50%; background: #0f122066; }
+  .sq.hint.cap::after { width: 86%; height: 86%; background: none; border: 4px solid #0f122066; box-sizing: border-box; }
+  .sq .pc-w { color: #fff; text-shadow: 0 0 2px #000, 0 0 2px #000, 0 2px 3px #0008; }
+  .sq .pc-b { color: #141526; text-shadow: 0 0 2px #fff8; }
+  .sq .co { position: absolute; font-size: .6rem; font-weight: 700; color: #0f122088; }
+  .sq .co.f { right: 3px; bottom: 2px; } .sq .co.r { left: 3px; top: 2px; }
+  .puz-status { min-height: 3em; margin: 14px 0 4px; font-weight: 600; line-height: 1.45; }
+  .puz-status.win { color: var(--ok); }
+  .puz-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+  .puz-btns button { font: inherit; font-weight: 700; cursor: pointer; padding: 9px 14px; border-radius: 10px;
+    border: 1px solid var(--border); background: var(--card2); color: var(--text); }
+  .puz-btns button:hover { border-color: var(--accent); }
 
   footer { text-align: center; color: var(--muted); font-size: .85rem; padding: 24px 16px 40px; }
   footer .imp { display: block; width: fit-content; margin: 8px auto 0; font-size: .72rem; color: var(--muted); text-decoration: none; opacity: .75; }
@@ -307,7 +340,7 @@ const PAGES = {
       <h2>🎯 Was ich in meiner Freizeit mache</h2>
       <p class="lead" style="margin-bottom:16px">${esc(ICH.freizeit)}</p>
       <div class="features">
-        ${ICH.hobbys.map(([e, t, d]) => `<div class="feature hobby"><div class="he">${e}</div><b>${esc(t)}</b><span>${esc(d)}</span></div>`).join('')}
+        ${ICH.hobbys.map(([e, t, d]) => `<div class="feature hobby"><div class="he${e === '♟️' ? ' egg" onclick="openPuzzle()' : ''}">${e}</div><b>${esc(t)}</b><span>${esc(d)}</span></div>`).join('')}
       </div>
 
       <h2>✉️ Schreib mir gerne!</h2>
@@ -348,7 +381,9 @@ const PAGES = {
       <div class="pbtns">
         ${p.link ? `<a class="btn" href="${esc(p.link)}" target="_blank" rel="noopener">▶ Austesten</a>` : ''}
         ${p.code ? `<a class="btn ghost" href="${esc(p.code)}" target="_blank" rel="noopener">💻 Code ansehen</a>` : ''}
-      </div>`;
+      </div>
+      ${p.code ? `<p class="star-hint">Gefällt dir das Projekt? Dann lass mir doch auf
+        <a href="${esc(p.code)}" target="_blank" rel="noopener">GitHub</a> einen ⭐ da!</p>` : ''}`;
   },
   notfound() {
     return `<h1>🤔 Nicht gefunden</h1><p class="lead">Diese Seite gibt es nicht.</p><a class="btn" href="#home">Zurück zu Home</a>`;
@@ -373,6 +408,113 @@ function buildMenu() {
     + `<div class="soon">🛠️ Mehr kommt bald …</div><hr><a href="#projekte"><span class="emoji">📂</span><span>Alle Projekte</span></a>`;
 }
 
+/* ---------- Easter Egg: Matt in 2 (klick auf die Schachfigur) ---------- */
+const PUZZLE = { fen: 'kbK5/pp6/1P6/8/8/8/8/R7 w - - 0 1', von: 'Paul Morphy', loesung: ['Ra6', 'bxa6', 'b7#'] };
+const GLYPH = { k: '♚', q: '♛', r: '♜', b: '♝', n: '♞', p: '♟' };
+let game = null, sel = null, last = null, busy = false, run = 0;
+
+function loadChess(cb) {
+  if (window.Chess) return cb();
+  const s = document.createElement('script');
+  s.src = 'https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js';
+  s.onload = cb;
+  s.onerror = () => puzStatus('Das Schachbrett konnte nicht geladen werden 😕');
+  document.head.appendChild(s);
+}
+
+function openPuzzle() {
+  if ($('puzzle')) return;
+  const m = document.createElement('div');
+  m.className = 'modal'; m.id = 'puzzle';
+  m.innerHTML = `<div class="modal-box" role="dialog" aria-label="Schachrätsel">
+    <button class="modal-close" aria-label="Schließen" onclick="closePuzzle()">×</button>
+    <h3>♟️ Du hast mein Geheimnis gefunden!</h3>
+    <p class="sub">Weiß zieht und setzt in 2 Zügen matt. Ein Klassiker von ${PUZZLE.von}.</p>
+    <div class="board" id="board"></div>
+    <div class="puz-status" id="puzStatus">Klick auf eine weiße Figur und dann auf ihr Zielfeld.</div>
+    <div class="puz-btns">
+      <button onclick="resetPuzzle()">↺ Neu starten</button>
+      <button onclick="showSolution()">💡 Lösung zeigen</button>
+    </div>
+  </div>`;
+  m.addEventListener('click', e => { if (e.target === m) closePuzzle(); });
+  document.body.appendChild(m);
+  loadChess(resetPuzzle);
+}
+
+function closePuzzle() { const m = $('puzzle'); if (m) m.remove(); busy = false; run++; }
+function puzStatus(t, win) { const s = $('puzStatus'); if (s) { s.textContent = t; s.classList.toggle('win', !!win); } }
+// Verzögerte Aktion – fällt weg, wenn das Rätsel inzwischen neu gestartet oder geschlossen wurde
+const later = (fn, ms) => { const r = run; setTimeout(() => { if ($('puzzle') && r === run) fn(); }, ms); };
+
+function resetPuzzle() {
+  game = new Chess(PUZZLE.fen); sel = null; last = null; busy = false; run++;
+  drawBoard();
+  puzStatus('Klick auf eine weiße Figur und dann auf ihr Zielfeld.');
+}
+
+function drawBoard() {
+  if (!$('board')) return;
+  const targets = sel ? game.moves({ square: sel, verbose: true }).map(m => m.to) : [];
+  let html = '';
+  for (let r = 8; r >= 1; r--) for (let f = 0; f < 8; f++) {
+    const sq = 'abcdefgh'[f] + r, p = game.get(sq);
+    const cls = ['sq', (f + r) % 2 === 1 ? 'dark' : '',
+      last && (sq === last.from || sq === last.to) ? 'last' : '', sq === sel ? 'sel' : '',
+      targets.includes(sq) ? 'hint' + (p ? ' cap' : '') : ''].join(' ');
+    html += `<div class="${cls}" onclick="clickSquare('${sq}')">`
+      + (p ? `<span class="pc-${p.color}">${GLYPH[p.type]}︎</span>` : '')
+      + (r === 1 ? `<span class="co f">${sq[0]}</span>` : '') + (f === 0 ? `<span class="co r">${r}</span>` : '')
+      + '</div>';
+  }
+  $('board').innerHTML = html;
+}
+
+function clickSquare(sq) {
+  if (busy || !game || game.turn() !== 'w' || game.in_checkmate()) return;
+  const p = game.get(sq);
+  if (sel && sel !== sq) {
+    const mv = game.move({ from: sel, to: sq, promotion: 'q' });
+    if (mv) { sel = null; return afterWhiteMove(mv); }
+  }
+  sel = p && p.color === 'w' && sel !== sq ? sq : null;
+  drawBoard();
+}
+
+function afterWhiteMove(mv) {
+  last = mv; drawBoard();
+  const first = game.history().length === 1;
+  if (game.in_checkmate()) return puzStatus('♛ Schachmatt! Stark, du hast das Rätsel gelöst! 🎉', true);
+  busy = true;
+  if (!first) {
+    puzStatus('Das ist leider noch kein Matt. Versuch’s nochmal! 🤔');
+    return later(() => { game.undo(); last = null; busy = false; drawBoard(); }, 1100);
+  }
+  if (mv.san !== PUZZLE.loesung[0]) {
+    puzStatus('Hmm, damit klappt das Matt in 2 noch nicht. Probier einen anderen Zug! 🤔');
+    return later(() => { game.undo(); last = null; busy = false; drawBoard(); }, 1100);
+  }
+  puzStatus('Wow, du opferst den Turm? Mutig! 😮 Schwarz überlegt …');
+  later(() => {
+    // Meistens nimmt Schwarz den Turm – manchmal versucht er es anders
+    const replies = game.moves();
+    const r = replies.includes('bxa6') && Math.random() < 0.7 ? 'bxa6' : replies[Math.floor(Math.random() * replies.length)];
+    last = game.move(r); busy = false; drawBoard();
+    puzStatus(`Schwarz spielt ${r}. Jetzt du: Setz matt!`);
+  }, 900);
+}
+
+function showSolution() {
+  if (!game) return;
+  resetPuzzle(); busy = true;
+  puzStatus('1. Ra6!! Der Turm wird geopfert …');
+  PUZZLE.loesung.forEach((san, i) => later(() => {
+    last = game.move(san); drawBoard();
+    if (i === 1) puzStatus('1… bxa6: Schwarz nimmt den Turm. Jetzt ist die b-Linie offen …');
+    if (i === 2) puzStatus('2. b7#: Matt! (Zieht Schwarz stattdessen den Läufer, kommt 2. Rxa7#) 🎉', true);
+  }, 900 * (i + 1)));
+}
+
 function closeMenu() { $('dropdown').classList.remove('open'); $('dropBtn').setAttribute('aria-expanded', 'false'); }
 $('dropBtn').addEventListener('click', e => {
   e.stopPropagation();
@@ -380,7 +522,7 @@ $('dropBtn').addEventListener('click', e => {
   $('dropBtn').setAttribute('aria-expanded', open);
 });
 document.addEventListener('click', e => { if (!$('dropdown').contains(e.target)) closeMenu(); });
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeMenu(); closePuzzle(); } });
 window.addEventListener('hashchange', render);
 
 $('logo').textContent = ICH.name;
