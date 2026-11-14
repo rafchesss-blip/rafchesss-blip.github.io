@@ -40,17 +40,29 @@
           <span class="pill new">⭐ <b id="statNew">0</b> <span data-t="statNew"></span></span>
         </div>
       </div>
-      <div class="tiles">
-        <button class="tile t-quiz" data-start="all">
+      <h2 class="section-title" data-t="chooseMode"></h2>
+      <div class="pool" role="group">
+        <button data-pool="all" data-t="poolAll"></button>
+        <button data-pool="weak" data-t="poolWeak"></button>
+      </div>
+      <div class="tiles modes">
+        <button class="tile t-cards" data-start="cards">
+          <span class="tile-icon">🃏</span>
+          <span class="tile-title" data-t="tileCards"></span>
+          <span class="tile-sub" data-t="tileCardsSub"></span>
+        </button>
+        <button class="tile t-quiz" data-start="quiz">
           <span class="tile-icon">🎯</span>
           <span class="tile-title" data-t="tileQuiz"></span>
           <span class="tile-sub" data-t="tileQuizSub"></span>
         </button>
-        <button class="tile t-weak" data-start="weak">
-          <span class="tile-icon">💪</span>
-          <span class="tile-title" data-t="tileWeak"></span>
-          <span class="tile-sub" data-t="tileWeakSub"></span>
+        <button class="tile t-race" data-start="race">
+          <span class="tile-icon">🏎️</span>
+          <span class="tile-title" data-t="tileRace"></span>
+          <span class="tile-sub" data-t="tileRaceSub"></span>
         </button>
+      </div>
+      <div class="tiles">
         <button class="tile t-list" data-go="list">
           <span class="tile-icon">📖</span>
           <span class="tile-title" data-t="tileList"></span>
@@ -80,6 +92,58 @@
       </div>
     </section>
 
+    <!-- Karteikarten -->
+    <section id="cards" class="view" hidden>
+      <div class="quiz-head">
+        <button class="back" data-go="home" data-t-aria="back">←</button>
+        <div class="bar"><div class="bar-fill" id="cardBar"></div></div>
+        <span class="counter" id="cardCounter"></span>
+      </div>
+      <div class="flashcard" id="flashcard" tabindex="0">
+        <div class="flashcard-inner">
+          <div class="face face-front">
+            <div class="face-label" data-t="question"></div>
+            <div class="face-text" id="cardQ"></div>
+            <div class="face-hint" data-t="tapToFlip"></div>
+          </div>
+          <div class="face face-back" hidden>
+            <div class="face-q" id="cardQ2"></div>
+            <div class="face-label" data-t="answer"></div>
+            <div class="face-text" id="cardA"></div>
+          </div>
+        </div>
+      </div>
+      <div class="rate" id="rate" hidden>
+        <button class="btn rate-no" id="rateNo"><span>😕</span> <span data-t="notKnown"></span></button>
+        <button class="btn rate-yes" id="rateYes"><span>😄</span> <span data-t="known"></span></button>
+      </div>
+    </section>
+
+    <!-- Rennspiel -->
+    <section id="race" class="view" hidden>
+      <div class="race-wrap" id="raceWrap">
+        <canvas id="raceCanvas"></canvas>
+        <div class="race-hud">
+          <button class="back race-back" data-go="home" data-t-aria="back">←</button>
+          <div class="race-score">⭐ <b id="raceScore">0</b></div>
+          <div class="race-best">🏆 <b id="raceBest">0</b></div>
+        </div>
+        <div class="race-question" id="raceQuestion"></div>
+        <div class="race-bottom">
+          <div class="race-timer"><div id="raceTimer"></div></div>
+          <div class="race-answers" id="raceAnswers"></div>
+        </div>
+        <div class="race-banner" id="raceBanner" hidden></div>
+        <div class="race-panel" id="racePanel">
+          <div class="race-panel-icon" id="racePanelIcon">🏎️</div>
+          <h2 id="racePanelTitle"></h2>
+          <p id="racePanelText"></p>
+          <button class="btn primary" id="raceStart"></button>
+          <button class="btn ghost" data-go="home" data-t="toStart"></button>
+        </div>
+      </div>
+    </section>
+
     <!-- Ergebnis -->
     <section id="end" class="view" hidden>
       <div class="card end-card">
@@ -88,7 +152,6 @@
         <p class="end-score" id="endScore"></p>
         <div class="end-buttons">
           <button class="btn primary" data-start="again" data-t="again"></button>
-          <button class="btn" data-start="weak" data-t="tileWeak"></button>
           <button class="btn ghost" data-go="home" data-t="toStart"></button>
         </div>
       </div>
@@ -137,5 +200,6 @@
 
   <script src="fragen.js"></script>
   <script src="app.js"></script>
+  <script src="race.js"></script>
 </body>
 </html>

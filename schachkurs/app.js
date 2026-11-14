@@ -10,29 +10,38 @@ const UI = {
     statGood: "Kann ich",
     statPractice: "Üben",
     statNew: "Neu",
-    tileQuiz: "Quiz starten",
-    tileQuizSub: "10 Fragen, bunt gemischt",
-    tileWeak: "Schwierige üben",
-    tileWeakSub: "Nur Fragen, die noch nicht sitzen",
+    chooseMode: "Wie willst du lernen?",
+    poolAll: "Alle Fragen",
+    poolWeak: "Nur schwierige 💪",
+    tileCards: "Karteikarten",
+    tileCardsSub: "Umdrehen und selbst prüfen",
+    tileQuiz: "Quiz",
+    tileQuizSub: "4 Antworten – eine ist richtig",
+    tileRace: "Rennspiel",
+    tileRaceSub: "Schnell antworten, sonst kracht's!",
     tileList: "Alle Fragen",
     tileListSub: "Lesen und lernen",
     tileProgress: "Mein Fortschritt",
     tileProgressSub: "Was kann ich schon?",
     back: "Zurück",
     question: "Frage",
-    of: "von",
+    answer: "Antwort",
+    tapToFlip: "👆 Antippen zum Umdrehen",
+    known: "Gewusst",
+    notKnown: "Nicht gewusst",
     next: "Weiter",
     finish: "Ergebnis ansehen",
     yes: "Ja",
     no: "Nein",
     praise: ["Super! 🎉", "Richtig! 🌟", "Klasse! 👏", "Genau! ✨", "Toll gemacht! 🏆", "Spitze! 🚀"],
     wrong: "Fast! Richtig ist:",
-    again: "Nochmal spielen",
+    again: "Nochmal",
     toStart: "Zur Startseite",
     endGreat: "Großartig!",
     endGood: "Gut gemacht!",
     endTry: "Weiter üben!",
     endScore: (r, n) => `${r} von ${n} richtig`,
+    endKnown: (r, n) => `${r} von ${n} gewusst`,
     allGood: "Du kannst schon alle Fragen! 🏆",
     listHint: "Tippe auf eine Frage, um die Antwort zu sehen.",
     tapToReveal: "👆 Antippen für die Antwort",
@@ -41,6 +50,18 @@ const UI = {
     reset: "Fortschritt zurücksetzen",
     resetConfirm: "Willst du deinen ganzen Fortschritt wirklich löschen?",
     nothingHere: "Hier ist noch nichts.",
+    // Rennspiel
+    raceTitle: "Schach-Rennen",
+    raceIntro: "Lies die Frage. Dann hast du 2 Sekunden: Fahr auf die Spur mit der richtigen Antwort!\nFalsche Spur oder zu langsam – dann krachst du in den LKW. 💥",
+    raceStart: "Los geht's! 🏁",
+    raceAgain: "Nochmal fahren 🏁",
+    raceCrash: "💥 Crash!",
+    raceSlow: "⏰ Zu langsam!",
+    raceWasRight: (ans) => `Richtig wäre gewesen: ${ans}`,
+    raceResult: (n) => `Du hast ${n} ${n === 1 ? "Frage" : "Fragen"} geschafft.`,
+    raceNewBest: "🏆 Neuer Rekord!",
+    raceGo: "LOS!",
+    raceRight: ["Super! 🚀", "Weiter so! 🏎️", "Klasse! ⭐", "Turbo! 🔥"],
   },
   ru: {
     appName: "Шахматный курс",
@@ -49,29 +70,38 @@ const UI = {
     statGood: "Знаю",
     statPractice: "Повторить",
     statNew: "Новые",
-    tileQuiz: "Начать викторину",
-    tileQuizSub: "10 вопросов вперемешку",
-    tileWeak: "Трудные вопросы",
-    tileWeakSub: "Только то, что ещё не выучено",
+    chooseMode: "Как будем учить?",
+    poolAll: "Все вопросы",
+    poolWeak: "Только трудные 💪",
+    tileCards: "Карточки",
+    tileCardsSub: "Переверни и проверь себя",
+    tileQuiz: "Викторина",
+    tileQuizSub: "4 ответа – один правильный",
+    tileRace: "Гонка",
+    tileRaceSub: "Отвечай быстро, а то врежешься!",
     tileList: "Все вопросы",
     tileListSub: "Читать и учить",
     tileProgress: "Мои успехи",
     tileProgressSub: "Что я уже знаю?",
     back: "Назад",
     question: "Вопрос",
-    of: "из",
+    answer: "Ответ",
+    tapToFlip: "👆 Нажми, чтобы перевернуть",
+    known: "Знаю",
+    notKnown: "Не знаю",
     next: "Дальше",
     finish: "Посмотреть результат",
     yes: "Да",
     no: "Нет",
     praise: ["Супер! 🎉", "Правильно! 🌟", "Класс! 👏", "Точно! ✨", "Молодец! 🏆", "Отлично! 🚀"],
     wrong: "Почти! Правильный ответ:",
-    again: "Играть ещё раз",
+    again: "Ещё раз",
     toStart: "На главную",
     endGreat: "Великолепно!",
     endGood: "Хорошая работа!",
     endTry: "Продолжай тренироваться!",
     endScore: (r, n) => `${r} из ${n} правильно`,
+    endKnown: (r, n) => `Знаю: ${r} из ${n}`,
     allGood: "Ты уже знаешь все вопросы! 🏆",
     listHint: "Нажми на вопрос, чтобы увидеть ответ.",
     tapToReveal: "👆 Нажми, чтобы увидеть ответ",
@@ -80,11 +110,23 @@ const UI = {
     reset: "Сбросить успехи",
     resetConfirm: "Точно удалить все свои успехи?",
     nothingHere: "Здесь пока ничего нет.",
+    // Гонка
+    raceTitle: "Шахматная гонка",
+    raceIntro: "Прочитай вопрос. Потом у тебя 2 секунды: перестройся в полосу с правильным ответом!\nНеправильная полоса или слишком медленно – и ты врежешься в грузовик. 💥",
+    raceStart: "Поехали! 🏁",
+    raceAgain: "Ещё заезд 🏁",
+    raceCrash: "💥 Авария!",
+    raceSlow: "⏰ Слишком медленно!",
+    raceWasRight: (ans) => `Правильный ответ: ${ans}`,
+    raceResult: (n) => `Правильных ответов: ${n}`,
+    raceNewBest: "🏆 Новый рекорд!",
+    raceGo: "СТАРТ!",
+    raceRight: ["Супер! 🚀", "Так держать! 🏎️", "Класс! ⭐", "Турбо! 🔥"],
   },
 };
 
 const PIECES = ["♞", "♛", "♜", "♝", "♚", "♟"];
-const QUIZ_LENGTH = 10;
+const SESSION_LENGTH = 10;
 const ALL = THEMEN.flatMap((t) => t.fragen.map((f) => ({ ...f, thema: t.id })));
 const BY_ID = Object.fromEntries(ALL.map((f) => [f.id, f]));
 
@@ -96,7 +138,7 @@ function load() {
 function save() {
   try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch { /* privat */ }
 }
-const state = Object.assign({ lang: "de", stats: {} }, load());
+const state = Object.assign({ lang: "de", stats: {}, pool: "all", raceBest: 0 }, load());
 
 const t = (key) => UI[state.lang][key];
 const q = (f) => f[state.lang][0];
@@ -155,9 +197,33 @@ function distractors(f) {
   return picked;
 }
 
+/** Antwortmöglichkeiten einer Frage (ids bzw. @yes/@no), gemischt. */
+function optionsFor(f) {
+  return isYesNo(f) ? ["@yes", "@no"] : shuffle([f.id, ...distractors(f)]);
+}
+function optionText(opt) {
+  if (opt === "@yes") return t("yes");
+  if (opt === "@no") return t("no");
+  return a(BY_ID[opt]);
+}
+function isRightOption(id, opt) {
+  const f = BY_ID[id];
+  if (opt === "@yes" || opt === "@no") return (opt === "@yes") === (norm(f.de[1]) === "ja");
+  return opt === id;
+}
+
+/** Fragen für eine Runde – alle oder nur die, die noch nicht sitzen. */
+function questionPool() {
+  if (state.pool !== "weak") return shuffle(ALL);
+  const weak = ALL.filter((f) => status(f.id) !== "good");
+  // Erst die mit Fehlern, dann neue.
+  return shuffle(weak).sort((x, y) => (status(y.id) === "practice") - (status(x.id) === "practice"));
+}
+
 // ── Seiten wechseln ─────────────────────────────────────────────────────
 function go(view) {
   document.querySelectorAll(".view").forEach((v) => { v.hidden = v.id !== view; });
+  if (view !== "race" && window.Race) Race.stop();
   if (view === "home") renderHome();
   if (view === "list") renderList();
   if (view === "progress") renderProgress();
@@ -173,7 +239,9 @@ function applyLang() {
   const visible = document.querySelector(".view:not([hidden])");
   if (!visible) return;
   if (visible.id === "quiz") renderQuestion(true);
+  else if (visible.id === "cards") renderCard(true);
   else if (visible.id === "end") renderEnd(false);
+  else if (visible.id === "race") Race.relabel();
   else go(visible.id);
 }
 
@@ -188,53 +256,99 @@ function renderHome() {
   $("#statGood").textContent = c.good;
   $("#statPractice").textContent = c.practice;
   $("#statNew").textContent = c.new;
+  document.querySelectorAll("[data-pool]").forEach((b) => b.classList.toggle("active", b.dataset.pool === state.pool));
+}
+
+/** Startet Karteikarten, Quiz oder Rennspiel mit den gewählten Fragen. */
+let session = null; // { kind, items: [{id, options, chosen}], index, right }
+
+function startSession(kind) {
+  if (kind === "again") kind = session ? session.kind : "quiz";
+  const pool = questionPool();
+  if (!pool.length) {
+    toast(t("allGood"));
+    burst();
+    return;
+  }
+  if (kind === "race") {
+    go("race");
+    Race.open(pool);
+    return;
+  }
+  const items = pool.slice(0, SESSION_LENGTH).map((f) => ({
+    id: f.id,
+    options: kind === "quiz" ? optionsFor(f) : null,
+    chosen: null,
+  }));
+  session = { kind, items, index: 0, right: 0 };
+  go(kind);
+  if (kind === "quiz") renderQuestion();
+  else renderCard();
+}
+
+// ── Karteikarten ────────────────────────────────────────────────────────
+function renderCard(keep = false) {
+  const item = session.items[session.index];
+  const f = BY_ID[item.id];
+  const n = session.items.length;
+  $("#cardCounter").textContent = `${session.index + 1}/${n}`;
+  $("#cardBar").style.width = `${(session.index / n) * 100}%`;
+  $("#cardQ").textContent = q(f);
+  $("#cardA").textContent = a(f);
+  $("#cardQ2").textContent = q(f);
+  const card = $("#flashcard");
+  if (!keep) {
+    card.classList.remove("flipped", "pop", "turning");
+    showFace(false);
+    void card.offsetWidth;
+    card.classList.add("pop");
+    $("#rate").hidden = true;
+  }
+}
+
+function showFace(back) {
+  $("#flashcard .face-front").hidden = back;
+  $("#flashcard .face-back").hidden = !back;
+}
+
+let turning = false;
+function flipCard() {
+  if (turning) return;
+  const card = $("#flashcard");
+  const back = !card.classList.contains("flipped");
+  card.classList.toggle("flipped", back);
+  if (back) $("#rate").hidden = false;
+  if (reduceMotion) return showFace(back);
+  // In der Mitte der Klapp-Animation (Karte ist flach) die Seite wechseln.
+  turning = true;
+  card.classList.remove("pop", "turning");
+  void card.offsetWidth;
+  card.classList.add("turning");
+  setTimeout(() => showFace(back), 220);
+  setTimeout(() => { card.classList.remove("turning"); turning = false; }, 450);
+}
+
+function rateCard(known) {
+  const item = session.items[session.index];
+  record(item.id, known);
+  if (known) { session.right++; burst(18); }
+  if (session.index + 1 < session.items.length) {
+    session.index++;
+    renderCard();
+  } else {
+    go("end");
+    renderEnd(true);
+  }
 }
 
 // ── Quiz ────────────────────────────────────────────────────────────────
-let quiz = null; // { mode, items: [{id, options, chosen}], index, right }
-
-function startQuiz(mode) {
-  if (mode === "again") mode = quiz ? quiz.mode : "all";
-  let pool;
-  if (mode === "weak") {
-    // Erst die mit Fehlern, dann neue – was „gut" sitzt, kommt nicht dran.
-    const weak = ALL.filter((f) => status(f.id) !== "good");
-    pool = shuffle(weak).sort((x, y) => (status(y.id) === "practice") - (status(x.id) === "practice"));
-    if (!pool.length) {
-      toast(t("allGood"));
-      burst();
-      return;
-    }
-  } else {
-    pool = shuffle(ALL);
-  }
-  const items = pool.slice(0, QUIZ_LENGTH).map((f) => {
-    const options = isYesNo(f) ? ["@yes", "@no"] : shuffle([f.id, ...distractors(f)]);
-    return { id: f.id, options, chosen: null };
-  });
-  quiz = { mode, items, index: 0, right: 0 };
-  go("quiz");
-  renderQuestion();
-}
-
-function optionText(opt) {
-  if (opt === "@yes") return t("yes");
-  if (opt === "@no") return t("no");
-  return a(BY_ID[opt]);
-}
-function isCorrect(item, opt) {
-  const f = BY_ID[item.id];
-  if (opt === "@yes" || opt === "@no") return (opt === "@yes") === (norm(f.de[1]) === "ja");
-  return opt === item.id;
-}
-
 function renderQuestion(keep = false) {
-  const item = quiz.items[quiz.index];
+  const item = session.items[session.index];
   const f = BY_ID[item.id];
-  const n = quiz.items.length;
-  $("#counter").textContent = `${quiz.index + 1}/${n}`;
-  $("#barFill").style.width = `${((quiz.index + (item.chosen ? 1 : 0)) / n) * 100}%`;
-  $("#qBadge").textContent = PIECES[quiz.index % PIECES.length];
+  const n = session.items.length;
+  $("#counter").textContent = `${session.index + 1}/${n}`;
+  $("#barFill").style.width = `${((session.index + (item.chosen ? 1 : 0)) / n) * 100}%`;
+  $("#qBadge").textContent = PIECES[session.index % PIECES.length];
   $("#qText").textContent = q(f);
 
   const box = $("#answers");
@@ -264,22 +378,22 @@ function renderQuestion(keep = false) {
 }
 
 function choose(opt) {
-  const item = quiz.items[quiz.index];
+  const item = session.items[session.index];
   if (item.chosen) return;
   item.chosen = opt;
-  const right = isCorrect(item, opt);
-  if (right) quiz.right++;
+  const right = isRightOption(item.id, opt);
+  if (right) session.right++;
   record(item.id, right);
   showResult(true);
 }
 
 function showResult(animate) {
-  const item = quiz.items[quiz.index];
-  const right = isCorrect(item, item.chosen);
+  const item = session.items[session.index];
+  const right = isRightOption(item.id, item.chosen);
   [...$("#answers").children].forEach((b, i) => {
     const opt = item.options[i];
     b.disabled = true;
-    if (isCorrect(item, opt)) b.classList.add("correct");
+    if (isRightOption(item.id, opt)) b.classList.add("correct");
     else if (opt === item.chosen) b.classList.add("wrong");
     else b.classList.add("dim");
   });
@@ -289,16 +403,16 @@ function showResult(animate) {
   fb.className = `feedback ${right ? "good" : "bad"}`;
   if (right) {
     const praise = t("praise");
-    fb.textContent = praise[(quiz.index + quiz.right) % praise.length];
+    fb.textContent = praise[(session.index + session.right) % praise.length];
   } else {
-    const correctOpt = item.options.find((o) => isCorrect(item, o));
+    const correctOpt = item.options.find((o) => isRightOption(item.id, o));
     fb.textContent = `${t("wrong")} ${optionText(correctOpt)}`;
   }
 
   const next = $("#nextBtn");
   next.hidden = false;
-  next.textContent = quiz.index + 1 < quiz.items.length ? t("next") : t("finish");
-  $("#barFill").style.width = `${((quiz.index + 1) / quiz.items.length) * 100}%`;
+  next.textContent = session.index + 1 < session.items.length ? t("next") : t("finish");
+  $("#barFill").style.width = `${((session.index + 1) / session.items.length) * 100}%`;
 
   if (animate) {
     const card = $("#qCard");
@@ -310,8 +424,8 @@ function showResult(animate) {
 }
 
 function nextQuestion() {
-  if (quiz.index + 1 < quiz.items.length) {
-    quiz.index++;
+  if (session.index + 1 < session.items.length) {
+    session.index++;
     renderQuestion();
   } else {
     go("end");
@@ -319,16 +433,16 @@ function nextQuestion() {
   }
 }
 
-// ── Ergebnis ────────────────────────────────────────────────────────────
+// ── Ergebnis (Karteikarten und Quiz) ────────────────────────────────────
 function renderEnd(animate) {
-  const n = quiz.items.length;
-  const share = quiz.right / n;
+  const n = session.items.length;
+  const share = session.right / n;
   const stars = share >= 0.9 ? 3 : share >= 0.6 ? 2 : 1;
   $("#stars").innerHTML = [0, 1, 2]
     .map((i) => `<span class="${i < stars ? "" : "off"}" style="animation-delay:${i * 0.18}s">⭐</span>`)
     .join("");
   $("#endTitle").textContent = stars === 3 ? t("endGreat") : stars === 2 ? t("endGood") : t("endTry");
-  $("#endScore").textContent = t("endScore")(quiz.right, n);
+  $("#endScore").textContent = (session.kind === "cards" ? t("endKnown") : t("endScore"))(session.right, n);
   if (animate && stars >= 2) setTimeout(() => burst(stars === 3 ? 160 : 80), 300);
 }
 
@@ -471,12 +585,11 @@ function tick() {
     ctx.translate(p.x, p.y);
     ctx.rotate(p.rot);
     ctx.globalAlpha = Math.max(0, 1 - p.life / 160);
+    ctx.fillStyle = p.color;
     if (p.piece) {
-      ctx.fillStyle = p.color;
       ctx.font = `${p.size * 2.6}px serif`;
       ctx.fillText(p.piece, -p.size, p.size);
     } else {
-      ctx.fillStyle = p.color;
       ctx.fillRect(-p.size / 2, -p.size / 4, p.size, p.size / 2);
     }
     ctx.restore();
@@ -520,7 +633,13 @@ document.addEventListener("click", (e) => {
   const goBtn = e.target.closest("[data-go]");
   if (goBtn) return go(goBtn.dataset.go);
   const start = e.target.closest("[data-start]");
-  if (start) return startQuiz(start.dataset.start);
+  if (start) return startSession(start.dataset.start);
+  const pool = e.target.closest("[data-pool]");
+  if (pool) {
+    state.pool = pool.dataset.pool;
+    save();
+    return renderHome();
+  }
   const lang = e.target.closest("[data-lang]");
   if (lang) {
     state.lang = lang.dataset.lang;
@@ -534,6 +653,9 @@ document.addEventListener("click", (e) => {
   }
 });
 $("#nextBtn").addEventListener("click", nextQuestion);
+$("#flashcard").addEventListener("click", flipCard);
+$("#rateYes").addEventListener("click", () => rateCard(true));
+$("#rateNo").addEventListener("click", () => rateCard(false));
 $("#resetBtn").addEventListener("click", () => {
   if (!confirm(t("resetConfirm"))) return;
   state.stats = {};
@@ -541,10 +663,18 @@ $("#resetBtn").addEventListener("click", () => {
   renderProgress();
 });
 
-// Tastatur: 1–4 bzw. A–D wählen, Enter = weiter.
+// Tastatur: Quiz 1–4/A–D + Enter; Karteikarten Leertaste = umdrehen, ←/→.
 document.addEventListener("keydown", (e) => {
-  if ($("#quiz").hidden || !quiz) return;
-  const item = quiz.items[quiz.index];
+  if (!$("#cards").hidden && session) {
+    if (e.key === " " || e.key === "Enter") { e.preventDefault(); flipCard(); }
+    else if ($("#flashcard").classList.contains("flipped")) {
+      if (e.key === "ArrowRight") rateCard(true);
+      if (e.key === "ArrowLeft") rateCard(false);
+    }
+    return;
+  }
+  if ($("#quiz").hidden || !session) return;
+  const item = session.items[session.index];
   const idx = "1234".indexOf(e.key) >= 0 ? "1234".indexOf(e.key) : "abcd".indexOf(e.key.toLowerCase());
   if (!item.chosen && idx >= 0 && idx < item.options.length) choose(item.options[idx]);
   else if (item.chosen && e.key === "Enter" && document.activeElement !== $("#nextBtn")) nextQuestion();

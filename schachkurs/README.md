@@ -4,8 +4,17 @@ Lernfragen für den Schachkurs, auf Deutsch und Russisch.
 
 **Seite:** https://rafchesss-blip.github.io/schachkurs/
 
+Drei Lernmodi (jeweils mit allen Fragen oder nur den schwierigen):
+
+- **Karteikarten:** Frage lesen, Karte umdrehen, „Gewusst“ oder „Nicht gewusst“
 - **Quiz:** 10 Fragen mit je 4 Antworten zum Antippen
-- **Schwierige üben:** nur Fragen, die noch nicht sitzen
+- **Rennspiel:** Man fährt Auto (Sicht vom Fahrersitz). Über jeder Spur hängt
+  ein Schild mit einer Antwort. Nach dem Lesen hat man 2 Sekunden, um in die
+  richtige Spur zu fahren – falsche Spur oder zu langsam: Crash in den LKW.
+  Die Zeiten stehen oben in `race.js` (`ANSWER_TIME`, `readTime`).
+
+Außerdem:
+
 - **Alle Fragen:** zum Lesen und Lernen, Antwort per Antippen
 - **Mein Fortschritt:** ✅ kann ich (2× hintereinander richtig), 🔄 üben, ⭐ neu
 

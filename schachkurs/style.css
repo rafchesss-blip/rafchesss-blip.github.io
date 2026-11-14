@@ -315,6 +315,140 @@ main { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; padding
 .empty { text-align: center; color: var(--muted); padding: 24px; font-size: 1.1rem; }
 .reset { display: block; margin: 20px auto 0; }
 
+/* ── Modus-Auswahl ──────────────────────────────────────────────────── */
+.section-title { text-align: center; font-size: 1.35rem; font-weight: 900; margin: 26px 0 10px; }
+.pool {
+  display: flex; width: fit-content; margin: 0 auto; background: #fff;
+  border-radius: 999px; padding: 4px; box-shadow: var(--shadow);
+}
+.pool button {
+  border: 0; background: none; border-radius: 999px; padding: 8px 16px;
+  font-weight: 800; transition: background .25s, color .25s;
+}
+.pool button.active { background: var(--practice); color: #fff; }
+.pool button[data-pool="all"].active { background: var(--primary); }
+.tiles.modes { grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: 16px; }
+.tiles.modes + .tiles { margin-top: 16px; }
+.t-cards { background: linear-gradient(135deg, #f472b6, #db2777); }
+.t-race { background: linear-gradient(135deg, #fb923c, #dc2626); }
+.t-race .tile-icon { animation: vroom 1.6s ease-in-out infinite; }
+@keyframes vroom {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(8px) rotate(-4deg); }
+}
+
+/* ── Karteikarten ───────────────────────────────────────────────────── */
+.flashcard { cursor: pointer; outline: none; }
+.flashcard-inner { display: grid; min-height: 320px; }
+.flashcard.pop .flashcard-inner { animation: pop .45s cubic-bezier(.2, .9, .3, 1.3); }
+/* Umdrehen: Karte klappt flach zusammen, wechselt die Seite, klappt auf. */
+.flashcard.turning .flashcard-inner { animation: turn .44s ease-in-out; }
+@keyframes turn {
+  0% { transform: scaleX(1); }
+  50% { transform: scaleX(0) scaleY(1.04); }
+  100% { transform: scaleX(1); }
+}
+.face {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+  padding: 28px; border-radius: var(--radius); text-align: center;
+  box-shadow: var(--shadow);
+}
+.face[hidden] { display: none; }
+.face-front { background: linear-gradient(160deg, #fff, #fdf2f8); border: 4px solid #f9a8d4; }
+.face-back { background: linear-gradient(160deg, #fff, #f0fdf4); border: 4px solid #86efac; }
+.face-label {
+  font-weight: 900; text-transform: uppercase; letter-spacing: .12em; font-size: .85rem;
+  padding: 5px 12px; border-radius: 999px;
+}
+.face-front .face-label { background: #fce7f3; color: #be185d; }
+.face-back .face-label { background: var(--good-bg); color: var(--good); }
+.face-text { font-size: clamp(1.3rem, 4.5vw, 1.9rem); font-weight: 900; line-height: 1.3; }
+.face-back .face-text { color: var(--good); }
+.face-q { color: var(--muted); font-weight: 700; font-size: .98rem; max-width: 520px; }
+.face-hint { color: var(--muted); animation: hintPulse 1.8s ease-in-out infinite; }
+@keyframes hintPulse { 50% { opacity: .45; transform: scale(.97); } }
+.rate { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; animation: pop .35s; }
+.rate .btn { padding: 16px; font-size: 1.1rem; }
+.rate-no { background: var(--bad-bg); color: var(--bad); }
+.rate-yes { background: var(--good-bg); color: var(--good); }
+
+/* ── Rennspiel ──────────────────────────────────────────────────────── */
+.race-wrap {
+  position: relative; height: min(78vh, 640px); min-height: 460px;
+  border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow);
+  background: #0ea5e9; touch-action: manipulation; user-select: none;
+}
+.race-wrap.shake { animation: crashShake .6s; }
+@keyframes crashShake {
+  0%, 100% { transform: none; }
+  15% { transform: translate(-14px, 8px) rotate(-1.5deg); }
+  30% { transform: translate(12px, -6px) rotate(1.5deg); }
+  45% { transform: translate(-9px, 5px); }
+  60% { transform: translate(7px, -3px); }
+  80% { transform: translate(-3px, 2px); }
+}
+#raceCanvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.race-hud {
+  position: absolute; top: 12px; left: 12px; right: 12px;
+  display: flex; align-items: center; gap: 10px; z-index: 2;
+}
+.race-hud .back { width: 40px; height: 40px; }
+.race-score, .race-best {
+  background: rgba(15, 23, 42, .55); color: #fff; border-radius: 999px;
+  padding: 7px 14px; font-weight: 900; backdrop-filter: blur(4px);
+}
+.race-best { margin-left: auto; }
+.race-score.bump { animation: bounce .5s; }
+.race-question {
+  position: absolute; top: 62px; left: 50%; transform: translateX(-50%);
+  width: min(92%, 640px); z-index: 2;
+  background: rgba(255, 255, 255, .94); border-radius: 20px; padding: 12px 16px;
+  text-align: center; font-weight: 900; font-size: clamp(1rem, 3.4vw, 1.3rem);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, .2);
+}
+.race-question:empty { display: none; }
+.race-question.pop { animation: pop .4s cubic-bezier(.2, .9, .3, 1.3); }
+.race-bottom { position: absolute; left: 12px; right: 12px; bottom: 12px; z-index: 2; }
+.race-timer { height: 12px; background: rgba(15, 23, 42, .45); border-radius: 999px; overflow: hidden; margin-bottom: 8px; }
+#raceTimer { height: 100%; width: 100%; background: linear-gradient(90deg, #f43f5e, #facc15, #4ade80); border-radius: 999px; }
+.race-answers { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.race-answers.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.race-answer {
+  display: flex; align-items: center; gap: 8px; min-height: 52px;
+  border: 0; border-radius: 16px; padding: 8px 10px; text-align: left;
+  font-weight: 900; font-size: .98rem; color: #1e1b4b;
+  background: var(--c); box-shadow: 0 5px 0 rgba(0, 0, 0, .25);
+  transition: transform .1s, opacity .2s, filter .2s;
+}
+.race-answer .letter {
+  flex: none; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 10px;
+  background: rgba(255, 255, 255, .7); font-weight: 900;
+}
+.race-answer:active:not(:disabled) { transform: translateY(3px); box-shadow: 0 2px 0 rgba(0, 0, 0, .25); }
+.race-answer:disabled { cursor: default; }
+.race-answers.locked .race-answer { filter: saturate(.35) brightness(.95); opacity: .75; }
+.race-answer.picked { outline: 4px solid #fff; }
+.race-banner {
+  position: absolute; top: 42%; left: 50%; transform: translate(-50%, -50%);
+  z-index: 3; font-size: clamp(2rem, 9vw, 4rem); font-weight: 900; color: #fff;
+  text-shadow: 0 4px 0 rgba(0, 0, 0, .35), 0 0 30px rgba(0, 0, 0, .4);
+  animation: bannerIn .5s cubic-bezier(.2, .9, .3, 1.5); white-space: nowrap; pointer-events: none;
+}
+@keyframes bannerIn { from { transform: translate(-50%, -50%) scale(0) rotate(-12deg); } }
+.race-panel {
+  position: absolute; inset: 0; z-index: 4;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+  padding: 24px; text-align: center; color: #fff;
+  background: radial-gradient(circle at 50% 40%, rgba(124, 58, 237, .85), rgba(30, 27, 75, .92));
+  animation: viewIn .4s;
+}
+.race-panel[hidden] { display: none; }
+.race-panel h2 { font-size: clamp(1.8rem, 6vw, 2.6rem); font-weight: 900; margin: 0; }
+.race-panel p { max-width: 460px; margin: 0 0 10px; font-size: 1.05rem; opacity: .95; white-space: pre-line; }
+.race-panel .btn { min-width: 240px; }
+.race-panel .btn.ghost { color: #ddd6fe; }
+.race-panel-icon { font-size: 4.5rem; animation: hop 2.4s ease-in-out infinite; }
+
 /* ── Handy ──────────────────────────────────────────────────────────── */
 @media (max-width: 560px) {
   .tiles { grid-template-columns: minmax(0, 1fr); gap: 12px; }
@@ -326,6 +460,10 @@ main { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; padding
   .lang button span { display: none; }
   .logo-text { font-size: 1rem; }
   .card { padding: 20px 16px; }
+  .tiles.modes { grid-template-columns: minmax(0, 1fr); }
+  .race-wrap { height: calc(100svh - 96px); min-height: 480px; border-radius: 20px; }
+  .race-answer { font-size: .9rem; min-height: 48px; }
+  .flashcard-inner { min-height: 300px; }
   .question-card { padding-top: 34px; }
 }
 
