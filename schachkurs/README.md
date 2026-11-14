@@ -45,3 +45,5 @@ unten an `THEMEN` einen Abschnitt an:
   beiden Knöpfe Ja und Nein.
 
 Nach dem Hochladen auf GitHub ist die neue Version nach ein, zwei Minuten online.
+Damit Browser nicht die alte Fassung zeigen, in `index.html` die Nummer hinter
+`?v=` bei den Dateien erhöhen (z. B. auf das aktuelle Datum).
