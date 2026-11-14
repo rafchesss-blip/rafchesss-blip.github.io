@@ -2,7 +2,8 @@
  * Rennspiel: Du fährst Auto (Sicht aus dem Fahrersitz). Über jeder Spur hängt
  * ein Schild mit einer Antwort – fahr in die richtige Spur. Das Benzin wird
  * ständig weniger; richtige Antworten füllen den Tank auf, bei einer falschen
- * (oder keiner) Antwort läuft der Tank leer.
+ * Antwort läuft der Tank leer. Wer nicht antwortet, verpasst die Frage – das
+ * Benzin sinkt dann einfach normal weiter.
  *
  * Gezeichnet wird mit einer einfachen Perspektive: Ein Punkt in der Welt
  * (x seitlich, z nach vorn) landet auf dem Bildschirm bei
@@ -204,8 +205,15 @@ window.Race = (() => {
       gateZ = null;
       phase = "pause";
       phaseTime = 0;
+    } else if (current.chosen === null) {
+      // Nicht geantwortet: Frage verpasst, weiter geht's – das Benzin sinkt
+      // einfach normal weiter (kein plötzliches Leerlaufen).
+      banner(t("raceMissed"), 900);
+      gateZ = null;
+      phase = "pause";
+      phaseTime = 0;
     } else {
-      // Falsch oder keine Antwort: Der Tank läuft in einem Rutsch leer.
+      // Falsche Antwort: Der Tank läuft in einem Rutsch leer.
       result = { right: rightAnswer() };
       fuelFrom = fuel;
       phase = "empty";

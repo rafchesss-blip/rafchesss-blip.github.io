@@ -11,7 +11,8 @@ Drei Lernmodi (jeweils mit allen Fragen oder nur den schwierigen):
 - **Rennspiel:** Man fährt Auto (Sicht vom Fahrersitz). Über jeder Spur hängt
   ein Schild mit einer Antwort. Nach dem Lesen hat man 4 Sekunden, um in die
   richtige Spur zu fahren. Das Benzin wird ständig weniger, richtige Antworten
-  füllen den Tank auf, bei einer falschen (oder keiner) Antwort läuft er leer.
+  füllen den Tank auf, bei einer falschen Antwort läuft er leer. Wer nicht
+  antwortet, verpasst die Frage, und das Benzin sinkt normal weiter.
   Zeiten und Benzin stehen oben in `race.js` (`ANSWER_TIME`, `readTime`,
   `FUEL_DRAIN`, `REFUEL`).
 
