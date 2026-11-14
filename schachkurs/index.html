@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Schachkurs-Quiz</title>
+  <meta name="description" content="Lernfragen für den Schachkurs – auf Deutsch und Russisch.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>♞</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Schwebende Figuren im Hintergrund -->
+  <div class="floaters" aria-hidden="true"></div>
+  <canvas id="confetti" aria-hidden="true"></canvas>
+
+  <header class="topbar">
+    <button class="logo" data-go="home" aria-label="Start">
+      <span class="logo-knight">♞</span>
+      <span class="logo-text" data-t="appName"></span>
+    </button>
+    <div class="lang" role="group" aria-label="Sprache / Язык">
+      <button data-lang="de">🇩🇪 <span>Deutsch</span></button>
+      <button data-lang="ru">🇷🇺 <span>Русский</span></button>
+    </div>
+  </header>
+
+  <main>
+    <!-- Start -->
+    <section id="home" class="view">
+      <div class="hero">
+        <div class="hero-knight">♞</div>
+        <h1 data-t="heroTitle"></h1>
+        <p class="hero-sub" data-t="heroSub"></p>
+        <div class="mini-stats">
+          <span class="pill good">✅ <b id="statGood">0</b> <span data-t="statGood"></span></span>
+          <span class="pill practice">🔄 <b id="statPractice">0</b> <span data-t="statPractice"></span></span>
+          <span class="pill new">⭐ <b id="statNew">0</b> <span data-t="statNew"></span></span>
+        </div>
+      </div>
+      <div class="tiles">
+        <button class="tile t-quiz" data-start="all">
+          <span class="tile-icon">🎯</span>
+          <span class="tile-title" data-t="tileQuiz"></span>
+          <span class="tile-sub" data-t="tileQuizSub"></span>
+        </button>
+        <button class="tile t-weak" data-start="weak">
+          <span class="tile-icon">💪</span>
+          <span class="tile-title" data-t="tileWeak"></span>
+          <span class="tile-sub" data-t="tileWeakSub"></span>
+        </button>
+        <button class="tile t-list" data-go="list">
+          <span class="tile-icon">📖</span>
+          <span class="tile-title" data-t="tileList"></span>
+          <span class="tile-sub" data-t="tileListSub"></span>
+        </button>
+        <button class="tile t-progress" data-go="progress">
+          <span class="tile-icon">📊</span>
+          <span class="tile-title" data-t="tileProgress"></span>
+          <span class="tile-sub" data-t="tileProgressSub"></span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Quiz -->
+    <section id="quiz" class="view" hidden>
+      <div class="quiz-head">
+        <button class="back" data-go="home" data-t-aria="back">←</button>
+        <div class="bar"><div class="bar-fill" id="barFill"></div></div>
+        <span class="counter" id="counter"></span>
+      </div>
+      <div class="card question-card" id="qCard">
+        <div class="q-badge" id="qBadge"></div>
+        <h2 class="q-text" id="qText"></h2>
+        <div class="answers" id="answers"></div>
+        <div class="feedback" id="feedback" hidden></div>
+        <button class="btn primary next" id="nextBtn" hidden></button>
+      </div>
+    </section>
+
+    <!-- Ergebnis -->
+    <section id="end" class="view" hidden>
+      <div class="card end-card">
+        <div class="stars" id="stars"></div>
+        <h2 id="endTitle"></h2>
+        <p class="end-score" id="endScore"></p>
+        <div class="end-buttons">
+          <button class="btn primary" data-start="again" data-t="again"></button>
+          <button class="btn" data-start="weak" data-t="tileWeak"></button>
+          <button class="btn ghost" data-go="home" data-t="toStart"></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Alle Fragen -->
+    <section id="list" class="view" hidden>
+      <div class="page-head">
+        <button class="back" data-go="home" data-t-aria="back">←</button>
+        <h2 data-t="tileList"></h2>
+      </div>
+      <p class="hint" data-t="listHint"></p>
+      <div id="listBody"></div>
+    </section>
+
+    <!-- Fortschritt -->
+    <section id="progress" class="view" hidden>
+      <div class="page-head">
+        <button class="back" data-go="home" data-t-aria="back">←</button>
+        <h2 data-t="tileProgress"></h2>
+      </div>
+      <div class="card progress-card">
+        <div class="ring" id="ring">
+          <svg viewBox="0 0 120 120">
+            <circle class="ring-bg" cx="60" cy="60" r="52"></circle>
+            <circle class="ring-fg" id="ringFg" cx="60" cy="60" r="52"></circle>
+          </svg>
+          <div class="ring-text"><b id="ringPct">0%</b><span data-t="ringLabel"></span></div>
+        </div>
+        <div class="progress-counts">
+          <div class="count good"><b id="cGood">0</b><span data-t="statGood"></span></div>
+          <div class="count practice"><b id="cPractice">0</b><span data-t="statPractice"></span></div>
+          <div class="count new"><b id="cNew">0</b><span data-t="statNew"></span></div>
+        </div>
+      </div>
+      <div class="filters" id="filters">
+        <button data-filter="all" data-t="filterAll"></button>
+        <button data-filter="good" data-t="statGood"></button>
+        <button data-filter="practice" data-t="statPractice"></button>
+        <button data-filter="new" data-t="statNew"></button>
+      </div>
+      <div id="progressBody"></div>
+      <button class="btn ghost reset" id="resetBtn" data-t="reset"></button>
+    </section>
+  </main>
+
+  <script src="fragen.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
