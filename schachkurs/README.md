@@ -10,8 +10,10 @@ Drei Lernmodi (jeweils mit allen Fragen oder nur den schwierigen):
 - **Quiz:** 10 Fragen mit je 4 Antworten zum Antippen
 - **Rennspiel:** Man fährt Auto (Sicht vom Fahrersitz). Über jeder Spur hängt
   ein Schild mit einer Antwort. Nach dem Lesen hat man 4 Sekunden, um in die
-  richtige Spur zu fahren – falsche Spur oder zu langsam: Crash in den LKW.
-  Die Zeiten stehen oben in `race.js` (`ANSWER_TIME`, `readTime`).
+  richtige Spur zu fahren. Das Benzin wird ständig weniger, richtige Antworten
+  füllen den Tank auf, bei einer falschen (oder keiner) Antwort läuft er leer.
+  Zeiten und Benzin stehen oben in `race.js` (`ANSWER_TIME`, `readTime`,
+  `FUEL_DRAIN`, `REFUEL`).
 
 Außerdem:
 

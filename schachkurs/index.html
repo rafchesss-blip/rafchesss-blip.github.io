@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=202611141654">
+  <link rel="stylesheet" href="style.css?v=202611141846">
 </head>
 <body>
   <!-- Schwebende Figuren im Hintergrund -->
@@ -130,7 +130,10 @@
         </div>
         <div class="race-question" id="raceQuestion"></div>
         <div class="race-bottom">
-          <div class="race-timer"><div id="raceTimer"></div></div>
+          <div class="race-fuel" id="raceFuelBox">
+            <span class="fuel-icon">⛽</span>
+            <div class="fuel-track"><div id="raceFuel"></div></div>
+          </div>
           <div class="race-answers" id="raceAnswers"></div>
         </div>
         <div class="race-banner" id="raceBanner" hidden></div>
@@ -198,8 +201,8 @@
     </section>
   </main>
 
-  <script src="fragen.js?v=202611141654"></script>
-  <script src="app.js?v=202611141654"></script>
-  <script src="race.js?v=202611141654"></script>
+  <script src="fragen.js?v=202611141846"></script>
+  <script src="app.js?v=202611141846"></script>
+  <script src="race.js?v=202611141846"></script>
 </body>
 </html>

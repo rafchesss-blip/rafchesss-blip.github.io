@@ -1,7 +1,8 @@
 /*
  * Rennspiel: Du fährst Auto (Sicht aus dem Fahrersitz). Über jeder Spur hängt
- * ein Schild mit einer Antwort – fahr in die richtige Spur. Falsche Spur oder
- * zu langsam: Crash in den LKW.
+ * ein Schild mit einer Antwort – fahr in die richtige Spur. Das Benzin wird
+ * ständig weniger; richtige Antworten füllen den Tank auf, bei einer falschen
+ * (oder keiner) Antwort läuft der Tank leer.
  *
  * Gezeichnet wird mit einer einfachen Perspektive: Ein Punkt in der Welt
  * (x seitlich, z nach vorn) landet auf dem Bildschirm bei
@@ -16,6 +17,10 @@ const readTime = (question, answers) =>        // Sekunden zum Lesen vorher
 const START_SPEED = 24;                        // Welt-Einheiten pro Sekunde
 const SPEED_STEP = 1.3;                        // schneller nach jeder richtigen Antwort
 const MAX_SPEED = 44;
+const FUEL_DRAIN = 4;      // Prozent Benzin pro Sekunde zu Beginn …
+const FUEL_DRAIN_STEP = 0.12; // … plus so viel pro richtiger Antwort
+const MAX_DRAIN = 8;
+const REFUEL = 35;         // Prozent Benzin für eine richtige Antwort
 
 const ROAD_HALF = 2.4;   // halbe Straßenbreite
 const CAM_H = 1;         // Kamerahöhe
@@ -34,13 +39,14 @@ window.Race = (() => {
   let raf = 0, last = 0;
 
   // Spielzustand
-  let phase = "idle"; // idle | intro | countdown | read | answer | resolve | crash | over
+  let phase = "idle"; // idle | intro | countdown | read | answer | resolve | pause | empty | stall | over
   let pool = [], poolIndex = 0;
   let current = null; // { f, options, lanes, chosen, answerAt, readUntil }
   let travel = 0, speed = START_SPEED;
   let camX = 0, targetX = 0, roll = 0;
-  let gateZ = null, truck = null;
-  let score = 0, phaseTime = 0, flash = 0, crack = null;
+  let gateZ = null;
+  let score = 0, phaseTime = 0;
+  let fuel = 100, fuelFrom = 100;
   let result = null; // { reason, right }
 
   // ── Größe ────────────────────────────────────────────────────────────
@@ -102,14 +108,14 @@ window.Race = (() => {
     travel = 0;
     speed = START_SPEED;
     camX = targetX = roll = 0;
-    gateZ = truck = current = result = crack = null;
+    gateZ = current = result = null;
     score = 0;
-    flash = 0;
+    fuel = 100;
     el("raceScore").textContent = "0";
     el("raceBest").textContent = state.raceBest || 0;
     el("raceQuestion").textContent = "";
     el("raceAnswers").innerHTML = "";
-    setTimer(1);
+    setFuel(1);
     el("raceBanner").hidden = true;
   }
 
@@ -186,26 +192,24 @@ window.Race = (() => {
     if (right) {
       score++;
       speed = Math.min(MAX_SPEED, speed + SPEED_STEP);
+      fuel = Math.min(100, fuel + REFUEL);
       const s = el("raceScore");
       s.textContent = score;
       s.classList.remove("bump");
       void s.offsetWidth;
       s.classList.add("bump");
       const praise = t("raceRight");
-      banner(praise[score % praise.length], 900);
+      banner(`${praise[score % praise.length]} ⛽`, 900);
       burst(14);
       gateZ = null;
       phase = "pause";
       phaseTime = 0;
     } else {
-      result = { reason: current.chosen === null ? "slow" : "crash", right: rightAnswer() };
-      // LKW in der eigenen Spur, kurz hinter dem Schild.
-      const lane = current.chosen ?? nearestLane();
-      truck = { lane, lanes: current.lanes, z: 16 };
-      targetX = laneX(lane, current.lanes);
-      phase = "crash";
+      // Falsch oder keine Antwort: Der Tank läuft in einem Rutsch leer.
+      result = { right: rightAnswer() };
+      fuelFrom = fuel;
+      phase = "empty";
       phaseTime = 0;
-      if (result.reason === "slow") banner(t("raceSlow"), 1100);
     }
   }
 
@@ -213,24 +217,20 @@ window.Race = (() => {
     const opt = current.options.find((o) => isRightOption(current.f.id, o));
     return optionText(opt);
   }
-  function nearestLane() {
-    let best = 0;
-    for (let i = 1; i < current.lanes; i++) {
-      if (Math.abs(laneX(i, current.lanes) - camX) < Math.abs(laneX(best, current.lanes) - camX)) best = i;
-    }
-    return best;
-  }
 
-  function impact() {
-    phase = "impact";
+  /** Kein Benzin mehr: Motor stottert, Auto rollt aus. */
+  function stall() {
+    if (!result) result = { right: current && current.chosen === null && phase !== "pause" ? rightAnswer() : null };
+    fuel = 0;
+    setFuel(0);
+    phase = "stall";
     phaseTime = 0;
-    flash = 1;
-    crack = { x: W / 2 + (Math.random() - 0.5) * W * 0.2, y: H * 0.45, seed: Math.random() };
     wrap.classList.remove("shake");
     void wrap.offsetWidth;
     wrap.classList.add("shake");
-    if (navigator.vibrate) navigator.vibrate([120, 60, 200]);
-    banner(t("raceCrash"), 1300);
+    if (navigator.vibrate) navigator.vibrate([80, 60, 80]);
+    el("raceAnswers").querySelectorAll("button").forEach((b) => { b.disabled = true; });
+    banner(t("raceEmpty"), 1600);
   }
 
   function gameOver() {
@@ -255,20 +255,21 @@ window.Race = (() => {
       el("racePanelText").textContent = t("raceIntro");
       el("raceStart").textContent = t("raceStart");
     } else {
-      el("racePanelIcon").textContent = result.newBest ? "🏆" : result.reason === "slow" ? "⏰" : "💥";
-      el("racePanelTitle").textContent = result.newBest ? t("raceNewBest")
-        : result.reason === "slow" ? t("raceSlow") : t("raceCrash");
-      el("racePanelText").textContent = `${t("raceResult")(score)}\n${t("raceWasRight")(result.right)}`;
+      el("racePanelIcon").textContent = result.newBest ? "🏆" : "⛽";
+      el("racePanelTitle").textContent = result.newBest ? t("raceNewBest") : t("raceEmpty");
+      el("racePanelText").textContent = t("raceResult")(score) +
+        (result.right ? `\n${t("raceWasRight")(result.right)}` : "");
       el("raceStart").textContent = t("raceAgain");
     }
   }
 
-  let timerShown = -1;
-  function setTimer(share) {
-    const v = Math.round(share * 200) / 200;
-    if (v === timerShown) return;
-    timerShown = v;
-    el("raceTimer").style.transform = `scaleX(${v})`;
+  let fuelShown = -1;
+  function setFuel(share) {
+    const v = Math.max(0, Math.round(share * 200) / 200);
+    if (v === fuelShown) return;
+    fuelShown = v;
+    el("raceFuel").style.transform = `scaleX(${v})`;
+    el("raceFuelBox").classList.toggle("low", v < 0.25);
   }
 
   let bannerTimer = 0;
@@ -312,28 +313,34 @@ window.Race = (() => {
       if (el("raceBanner").textContent !== label || el("raceBanner").hidden) banner(label, 700);
       if (phaseTime > 2.2) nextQuestion();
     }
-    if (phase === "read") {
-      setTimer(1);
-      if (phaseTime >= current.readFor) unlock();
-    }
+    if (phase === "read" && phaseTime >= current.readFor) unlock();
     if (phase === "pause" && phaseTime > 0.5) nextQuestion();
     if (phase === "answer" || phase === "resolve") {
       // Nach der Wahl Turbo zum Schild, damit man nicht wartet.
       const approach = phase === "resolve" ? Math.max(v, (gateZ - GATE_PASS_Z) / 0.45) : v;
       gateZ -= approach * dt;
       v = approach;
-      const left = Math.max(0, (gateZ - GATE_PASS_Z) / (speed * ANSWER_TIME));
-      if (phase === "answer") setTimer(left);
       if (gateZ <= GATE_PASS_Z) passGate();
     }
-    if (phase === "crash") {
-      truck.z -= v * dt;
-      if (gateZ !== null) gateZ -= v * dt; // Schild fährt hinter uns weg
-      if (truck.z <= 1.6) impact();
+    // Benzin wird während der Fahrt immer weniger.
+    if (["read", "answer", "resolve", "pause"].includes(phase)) {
+      fuel -= Math.min(MAX_DRAIN, FUEL_DRAIN + score * FUEL_DRAIN_STEP) * dt;
+      setFuel(fuel / 100);
+      if (fuel <= 0) stall();
     }
-    if (phase === "impact") {
-      v = Math.max(0, speed * (1 - phaseTime * 3));
-      if (phaseTime > 1.4) gameOver();
+    if (phase === "empty") {
+      // Tank läuft sichtbar leer, das Schild zieht vorbei.
+      fuel = fuelFrom * Math.max(0, 1 - phaseTime / 0.6);
+      setFuel(fuel / 100);
+      if (gateZ !== null) gateZ -= v * dt;
+      if (phaseTime >= 0.6) stall();
+    }
+    if (phase === "stall") {
+      // Ohne Benzin rollt das Auto stotternd aus.
+      const left = Math.max(0, 1 - phaseTime / 1.8);
+      v = speed * left * left * (0.85 + 0.15 * Math.sin(phaseTime * 40));
+      if (gateZ !== null) gateZ -= v * dt;
+      if (phaseTime > 2.1) gameOver();
     }
 
     travel += v * dt;
@@ -341,7 +348,6 @@ window.Race = (() => {
     const dx = targetX - camX;
     camX += dx * Math.min(1, dt * 7);
     roll += ((-dx * 0.08) - roll) * Math.min(1, dt * 8);
-    flash = Math.max(0, flash - dt * 1.6);
   }
 
   // ── Zeichnen ─────────────────────────────────────────────────────────
@@ -358,14 +364,8 @@ window.Race = (() => {
     drawGround();
     drawRoadside();
     if (gateZ !== null && current) drawGate(gateZ);
-    if (truck) drawTruck(truck);
     g.restore();
     drawHood();
-    if (crack) drawCrack();
-    if (flash > 0) {
-      g.fillStyle = `rgba(255,255,255,${flash})`;
-      g.fillRect(0, 0, W, H);
-    }
   }
 
   function drawSky() {
@@ -527,7 +527,7 @@ window.Race = (() => {
       const left = sx(-ROAD_HALF + lw * i + 0.06, z);
       const width = (lw - 0.12) * k;
       let color = LANE_COLORS[i];
-      if (phase === "crash" || phase === "impact" || phase === "pause") {
+      if (phase === "empty" || phase === "stall" || phase === "pause") {
         const right = isRightOption(current.f.id, current.options[i]);
         color = right ? "#22c55e" : i === current.chosen ? "#ef4444" : "#94a3b8";
       }
@@ -581,44 +581,6 @@ window.Race = (() => {
     g.fill();
   }
 
-  function drawTruck(tr) {
-    const z = tr.z;
-    if (z <= 0.5) return;
-    const k = F / z;
-    const lw = laneWidth(tr.lanes);
-    const cx = sx(laneX(tr.lane, tr.lanes), z);
-    const ground = sy(z);
-    const w = Math.min(lw * 0.95, 1.5) * k;
-    const h = 1.9 * k;
-    // Schatten
-    g.fillStyle = "rgba(0,0,0,.25)";
-    g.fillRect(cx - w * 0.55, ground - 0.05 * k, w * 1.1, 0.1 * k);
-    // Räder
-    g.fillStyle = "#111827";
-    g.fillRect(cx - w * 0.48, ground - 0.35 * k, w * 0.22, 0.35 * k);
-    g.fillRect(cx + w * 0.26, ground - 0.35 * k, w * 0.22, 0.35 * k);
-    // Aufbau (Rückseite des Anhängers)
-    g.fillStyle = "#f1f5f9";
-    g.fillRect(cx - w / 2, ground - h, w, h - 0.3 * k);
-    g.fillStyle = "#cbd5e1";
-    g.fillRect(cx - 0.02 * k, ground - h, 0.04 * k, h - 0.3 * k);
-    // Warnstreifen
-    for (let i = 0; i < 6; i++) {
-      g.fillStyle = i % 2 ? "#ef4444" : "#f8fafc";
-      g.fillRect(cx - w / 2 + (w / 6) * i, ground - 0.42 * k, w / 6, 0.12 * k);
-    }
-    // Rücklichter
-    g.fillStyle = "#dc2626";
-    g.fillRect(cx - w / 2 + 0.06 * k, ground - 0.62 * k, 0.16 * k, 0.12 * k);
-    g.fillRect(cx + w / 2 - 0.22 * k, ground - 0.62 * k, 0.16 * k, 0.12 * k);
-    // Aufschrift „LKW"
-    g.fillStyle = "#1e1b4b";
-    g.font = `900 ${0.32 * k}px Nunito, sans-serif`;
-    g.textAlign = "center";
-    g.textBaseline = "middle";
-    g.fillText(state.lang === "ru" ? "ГРУЗОВИК" : "LKW", cx, ground - h * 0.6, w * 0.9);
-  }
-
   function drawHood() {
     // Motorhaube des eigenen Autos (Sicht vom Fahrersitz).
     const top = H * 0.83;
@@ -642,29 +604,6 @@ window.Race = (() => {
     g.fillText("♞", W / 2, top + H * 0.035);
   }
 
-  function drawCrack() {
-    // Gesprungene Scheibe nach dem Crash.
-    g.save();
-    g.strokeStyle = "rgba(255,255,255,.85)";
-    g.lineWidth = 2 * dpr;
-    let seed = crack.seed * 1000;
-    const rnd = () => { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; };
-    for (let i = 0; i < 14; i++) {
-      const ang = (i / 14) * Math.PI * 2 + rnd() * 0.3;
-      let x = crack.x, y = crack.y;
-      g.beginPath();
-      g.moveTo(x, y);
-      for (let s = 0; s < 4; s++) {
-        const len = (0.05 + rnd() * 0.08) * H;
-        x += Math.cos(ang + (rnd() - 0.5) * 0.6) * len;
-        y += Math.sin(ang + (rnd() - 0.5) * 0.6) * len;
-        g.lineTo(x, y);
-      }
-      g.stroke();
-    }
-    g.restore();
-  }
-
   // ── Bedienung ────────────────────────────────────────────────────────
   el("raceStart").addEventListener("click", begin);
   document.addEventListener("keydown", (e) => {
@@ -680,7 +619,7 @@ window.Race = (() => {
   });
 
   // Nur zum Testen: aktueller Zustand.
-  const peek = () => ({ phase, gateZ, truckZ: truck ? truck.z : null, score });
+  const peek = () => ({ phase, gateZ, fuel, score });
 
   return { open, stop, relabel, peek };
 })();

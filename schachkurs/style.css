@@ -414,12 +414,24 @@ main { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; padding
   to { opacity: 1; transform: translateX(-50%); }
 }
 .race-bottom { position: absolute; left: 12px; right: 12px; bottom: 12px; z-index: 2; }
-.race-timer { height: 12px; background: rgba(15, 23, 42, .45); border-radius: 999px; overflow: hidden; margin-bottom: 8px; }
-#raceTimer {
+.race-fuel { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.fuel-icon {
+  flex: none; display: grid; place-items: center; width: 34px; height: 34px;
+  border-radius: 12px; background: rgba(15, 23, 42, .62); font-size: 1.15rem;
+}
+.fuel-track {
+  flex: 1; height: 16px; background: rgba(15, 23, 42, .5); border-radius: 999px;
+  overflow: hidden; border: 2px solid rgba(255, 255, 255, .7);
+}
+#raceFuel {
   height: 100%; width: 100%; border-radius: 999px;
-  background: linear-gradient(90deg, #f43f5e, #facc15, #4ade80);
+  background: linear-gradient(90deg, #f43f5e, #facc15 35%, #4ade80 70%);
   transform-origin: left center; will-change: transform;
 }
+/* Fast leer: Anzeige blinkt rot. */
+.race-fuel.low .fuel-icon { background: #dc2626; animation: fuelBlink .5s steps(2) infinite; }
+.race-fuel.low .fuel-track { border-color: #fecaca; }
+@keyframes fuelBlink { 50% { background: rgba(15, 23, 42, .62); } }
 /* Während des Rennens: Hintergrund-Figuren aus, Spielfläche als eigene Ebene. */
 body.racing .floaters { display: none; }
 #raceCanvas { will-change: transform; }
@@ -441,11 +453,12 @@ body.racing .floaters { display: none; }
 .race-answers.locked .race-answer { opacity: .55; }
 .race-answer.picked { outline: 4px solid #fff; }
 .race-banner {
-  position: absolute; top: 42%; left: 50%; transform: translate(-50%, -50%);
-  z-index: 3; font-size: clamp(2rem, 9vw, 4rem); font-weight: 900; color: #fff;
+  position: absolute; top: 36%; left: 50%; transform: translate(-50%, -50%);
+  z-index: 3; font-size: clamp(1.8rem, 8vw, 3.6rem); font-weight: 900; color: #fff;
+  width: max-content; max-width: 92%; text-align: center; line-height: 1.15;
   /* Harter Schatten statt weichem Leuchten – viel billiger beim Animieren. */
   text-shadow: 0 4px 0 rgba(0, 0, 0, .35), 0 0 2px rgba(0, 0, 0, .5);
-  animation: bannerIn .45s cubic-bezier(.2, .9, .3, 1.5); white-space: nowrap; pointer-events: none;
+  animation: bannerIn .45s cubic-bezier(.2, .9, .3, 1.5); pointer-events: none;
   will-change: transform;
 }
 @keyframes bannerIn { from { transform: translate(-50%, -50%) scale(0) rotate(-12deg); } }
