@@ -45,13 +45,27 @@ window.Race = (() => {
 
   // ── Größe ────────────────────────────────────────────────────────────
   function resize() {
-    dpr = Math.min(2, window.devicePixelRatio || 1);
+    // Höchstens 1,5-fache Auflösung: auf scharfen Handy-Displays sieht man
+    // keinen Unterschied, muss aber nur halb so viele Pixel zeichnen.
+    dpr = Math.min(1.5, window.devicePixelRatio || 1);
     const r = wrap.getBoundingClientRect();
     W = cv.width = Math.round(r.width * dpr);
     H = cv.height = Math.round(r.height * dpr);
     horizon = H * 0.4;
     F = H * 0.85;
+    // Verläufe einmal erzeugen statt in jedem Bild.
+    grad.sky = g.createLinearGradient(0, -H * 0.2, 0, horizon);
+    grad.sky.addColorStop(0, "#38bdf8");
+    grad.sky.addColorStop(1, "#e0f2fe");
+    grad.haze = g.createLinearGradient(0, horizon, 0, horizon + H * 0.12);
+    grad.haze.addColorStop(0, "rgba(224, 242, 254, .85)");
+    grad.haze.addColorStop(1, "rgba(224, 242, 254, 0)");
+    grad.hood = g.createLinearGradient(0, H * 0.83, 0, H);
+    grad.hood.addColorStop(0, "#f43f5e");
+    grad.hood.addColorStop(1, "#9f1239");
+    fitCache.clear();
   }
+  const grad = {};
   new ResizeObserver(() => { if (phase !== "idle") resize(); }).observe(wrap);
 
   const laneWidth = (n) => (ROAD_HALF * 2) / n;
@@ -61,6 +75,7 @@ window.Race = (() => {
 
   // ── Öffentliche Funktionen ───────────────────────────────────────────
   function open(questions) {
+    document.body.classList.add("racing");
     pool = questions;
     poolIndex = 0;
     resize();
@@ -74,6 +89,7 @@ window.Race = (() => {
     cancelAnimationFrame(raf);
     raf = 0;
     phase = "idle";
+    document.body.classList.remove("racing");
   }
 
   function relabel() {
@@ -94,7 +110,7 @@ window.Race = (() => {
     el("raceBest").textContent = state.raceBest || 0;
     el("raceQuestion").textContent = "";
     el("raceAnswers").innerHTML = "";
-    el("raceTimer").style.width = "100%";
+    setTimer(1);
     el("raceBanner").hidden = true;
   }
 
@@ -248,6 +264,14 @@ window.Race = (() => {
     }
   }
 
+  let timerShown = -1;
+  function setTimer(share) {
+    const v = Math.round(share * 200) / 200;
+    if (v === timerShown) return;
+    timerShown = v;
+    el("raceTimer").style.transform = `scaleX(${v})`;
+  }
+
   let bannerTimer = 0;
   function banner(text, ms) {
     const b = el("raceBanner");
@@ -290,7 +314,7 @@ window.Race = (() => {
       if (phaseTime > 2.2) nextQuestion();
     }
     if (phase === "read") {
-      el("raceTimer").style.width = "100%";
+      setTimer(1);
       if (phaseTime >= current.readFor) unlock();
     }
     if (phase === "pause" && phaseTime > 0.5) nextQuestion();
@@ -300,7 +324,7 @@ window.Race = (() => {
       gateZ -= approach * dt;
       v = approach;
       const left = Math.max(0, (gateZ - GATE_PASS_Z) / (speed * ANSWER_TIME));
-      if (phase === "answer") el("raceTimer").style.width = `${left * 100}%`;
+      if (phase === "answer") setTimer(left);
       if (gateZ <= GATE_PASS_Z) passGate();
     }
     if (phase === "crash") {
@@ -326,9 +350,11 @@ window.Race = (() => {
     if (!W) return;
     g.save();
     // Ganze Welt leicht mitneigen beim Lenken.
-    g.translate(W / 2, H);
-    g.rotate(roll);
-    g.translate(-W / 2, -H);
+    if (Math.abs(roll) > 0.004) {
+      g.translate(W / 2, H);
+      g.rotate(roll);
+      g.translate(-W / 2, -H);
+    }
     drawSky();
     drawGround();
     drawRoadside();
@@ -344,10 +370,7 @@ window.Race = (() => {
   }
 
   function drawSky() {
-    const sky = g.createLinearGradient(0, -H * 0.2, 0, horizon);
-    sky.addColorStop(0, "#38bdf8");
-    sky.addColorStop(1, "#e0f2fe");
-    g.fillStyle = sky;
+    g.fillStyle = grad.sky;
     g.fillRect(-W, -H, W * 3, horizon + H + 2);
     // Sonne
     g.fillStyle = "rgba(253, 224, 71, .95)";
@@ -389,7 +412,8 @@ window.Race = (() => {
   }
 
   function drawGround() {
-    const step = Math.max(1, Math.round(dpr));
+    // 2 Bildschirmpixel pro Streifen – sieht gleich aus, halb so viel Arbeit.
+    const step = Math.max(2, Math.round(2 * dpr));
     const lanes = current ? current.lanes : 4;
     const lw = laneWidth(lanes);
     for (let y = Math.floor(horizon) + 1; y < H; y += step) {
@@ -420,10 +444,7 @@ window.Race = (() => {
       }
     }
     // Dunst am Horizont
-    const haze = g.createLinearGradient(0, horizon, 0, horizon + H * 0.12);
-    haze.addColorStop(0, "rgba(224, 242, 254, .85)");
-    haze.addColorStop(1, "rgba(224, 242, 254, 0)");
-    g.fillStyle = haze;
+    g.fillStyle = grad.haze;
     g.fillRect(-W, horizon, W * 3, H * 0.12);
   }
 
@@ -493,10 +514,10 @@ window.Race = (() => {
       g.fillStyle = "#1e1b4b";
       g.textAlign = "center";
       g.textBaseline = "middle";
-      const letterSize = 0.36 * k;
+      const letterSize = Math.round(0.36 * k);
       g.font = `900 ${letterSize}px Nunito, sans-serif`;
       g.fillText("ABCD"[i], left + width / 2, top + boardH * 0.32);
-      const textSize = Math.min(0.2 * k, 40 * dpr);
+      const textSize = Math.round(Math.min(0.2 * k, 40 * dpr));
       if (textSize >= 7 * dpr) {
         g.font = `800 ${textSize}px Nunito, sans-serif`;
         fitText(optionText(current.options[i]), left + width / 2, top + boardH * 0.72, width * 0.92);
@@ -504,11 +525,25 @@ window.Race = (() => {
     }
   }
 
+  const fitCache = new Map();
   function fitText(text, x, y, maxW) {
-    let s = text;
-    if (g.measureText(s).width <= maxW) return g.fillText(s, x, y);
-    while (s.length > 1 && g.measureText(s + "…").width > maxW) s = s.slice(0, -1);
-    g.fillText(s + "…", x, y);
+    const key = `${g.font}|${Math.round(maxW / 4)}|${text}`;
+    let s = fitCache.get(key);
+    if (s === undefined) {
+      s = text;
+      if (g.measureText(s).width > maxW) {
+        // Binär suchen statt Buchstabe für Buchstabe.
+        let lo = 0, hi = text.length;
+        while (lo < hi) {
+          const mid = (lo + hi + 1) >> 1;
+          if (g.measureText(text.slice(0, mid) + "…").width <= maxW) lo = mid; else hi = mid - 1;
+        }
+        s = text.slice(0, Math.max(1, lo)) + "…";
+      }
+      if (fitCache.size > 400) fitCache.clear();
+      fitCache.set(key, s);
+    }
+    g.fillText(s, x, y);
   }
 
   function roundRect(x, y, w, h, r) {
@@ -562,10 +597,7 @@ window.Race = (() => {
   function drawHood() {
     // Motorhaube des eigenen Autos (Sicht vom Fahrersitz).
     const top = H * 0.83;
-    const hood = g.createLinearGradient(0, top, 0, H);
-    hood.addColorStop(0, "#f43f5e");
-    hood.addColorStop(1, "#9f1239");
-    g.fillStyle = hood;
+    g.fillStyle = grad.hood;
     g.beginPath();
     g.moveTo(-10, H);
     g.lineTo(-10, top + H * 0.08);
