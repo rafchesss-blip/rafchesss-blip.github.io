@@ -52,7 +52,7 @@ const UI = {
     nothingHere: "Hier ist noch nichts.",
     // Rennspiel
     raceTitle: "Schach-Rennen",
-    raceIntro: "Lies die Frage. Dann hast du 2 Sekunden: Fahr auf die Spur mit der richtigen Antwort!\nFalsche Spur oder zu langsam – dann krachst du in den LKW. 💥",
+    raceIntro: "Lies die Frage. Dann hast du 4 Sekunden: Fahr auf die Spur mit der richtigen Antwort!\nFalsche Spur oder zu langsam – dann krachst du in den LKW. 💥",
     raceStart: "Los geht's! 🏁",
     raceAgain: "Nochmal fahren 🏁",
     raceCrash: "💥 Crash!",
@@ -112,7 +112,7 @@ const UI = {
     nothingHere: "Здесь пока ничего нет.",
     // Гонка
     raceTitle: "Шахматная гонка",
-    raceIntro: "Прочитай вопрос. Потом у тебя 2 секунды: перестройся в полосу с правильным ответом!\nНеправильная полоса или слишком медленно – и ты врежешься в грузовик. 💥",
+    raceIntro: "Прочитай вопрос. Потом у тебя 4 секунды: перестройся в полосу с правильным ответом!\nНеправильная полоса или слишком медленно – и ты врежешься в грузовик. 💥",
     raceStart: "Поехали! 🏁",
     raceAgain: "Ещё заезд 🏁",
     raceCrash: "💥 Авария!",

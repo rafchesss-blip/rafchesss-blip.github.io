@@ -10,7 +10,7 @@
 "use strict";
 
 // Zeiten – hier lässt sich das Spiel leichter oder schwerer machen.
-const ANSWER_TIME = 2;                         // Sekunden zum Antworten
+const ANSWER_TIME = 4;                         // Sekunden zum Antworten
 const readTime = (question, answers) =>        // Sekunden zum Lesen vorher
   Math.min(6, Math.max(2, 1.2 + question.length * 0.035 + answers.join("").length * 0.015));
 const START_SPEED = 24;                        // Welt-Einheiten pro Sekunde
