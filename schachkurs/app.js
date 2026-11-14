@@ -542,9 +542,11 @@ let particles = [];
 let running = false;
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+// Konfetti braucht keine hohe Auflösung – 1 Pixel pro CSS-Pixel reicht.
+const CONFETTI_SCALE = 1;
 function resize() {
-  canvas.width = innerWidth * devicePixelRatio;
-  canvas.height = innerHeight * devicePixelRatio;
+  canvas.width = innerWidth * CONFETTI_SCALE;
+  canvas.height = innerHeight * CONFETTI_SCALE;
 }
 addEventListener("resize", resize);
 resize();
@@ -552,7 +554,7 @@ resize();
 function burst(count = 60) {
   if (reduceMotion) return;
   const colors = ["#7c3aed", "#f472b6", "#facc15", "#38bdf8", "#4ade80", "#fb923c"];
-  const dpr = devicePixelRatio;
+  const dpr = CONFETTI_SCALE;
   for (let i = 0; i < count; i++) {
     particles.push({
       x: innerWidth / 2 * dpr,
@@ -570,9 +572,11 @@ function burst(count = 60) {
   if (!running) { running = true; requestAnimationFrame(tick); }
 }
 
+let dirty = null; // Bereich, in dem im letzten Bild gezeichnet wurde
 function tick() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  const dpr = devicePixelRatio;
+  if (dirty) ctx.clearRect(dirty.x, dirty.y, dirty.w, dirty.h);
+  const dpr = CONFETTI_SCALE;
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
   particles = particles.filter((p) => p.life < 160 && p.y < canvas.height + 50);
   for (const p of particles) {
     p.life++;
@@ -581,6 +585,9 @@ function tick() {
     p.x += p.vx;
     p.y += p.vy;
     p.rot += p.vr;
+    const r = p.size * 3;
+    minX = Math.min(minX, p.x - r); maxX = Math.max(maxX, p.x + r);
+    minY = Math.min(minY, p.y - r); maxY = Math.max(maxY, p.y + r);
     ctx.save();
     ctx.translate(p.x, p.y);
     ctx.rotate(p.rot);
@@ -594,6 +601,7 @@ function tick() {
     }
     ctx.restore();
   }
+  dirty = particles.length ? { x: minX, y: minY, w: maxX - minX, h: maxY - minY } : null;
   if (particles.length) requestAnimationFrame(tick);
   else { running = false; ctx.clearRect(0, 0, canvas.width, canvas.height); }
 }

@@ -45,9 +45,8 @@ window.Race = (() => {
 
   // ── Größe ────────────────────────────────────────────────────────────
   function resize() {
-    // Höchstens 1,5-fache Auflösung: auf scharfen Handy-Displays sieht man
-    // keinen Unterschied, muss aber nur halb so viele Pixel zeichnen.
-    dpr = Math.min(1.5, window.devicePixelRatio || 1);
+    // Höchstens doppelte Auflösung – mehr sieht man nicht.
+    dpr = Math.min(2, window.devicePixelRatio || 1);
     const r = wrap.getBoundingClientRect();
     W = cv.width = Math.round(r.width * dpr);
     H = cv.height = Math.round(r.height * dpr);
@@ -194,7 +193,7 @@ window.Race = (() => {
       s.classList.add("bump");
       const praise = t("raceRight");
       banner(praise[score % praise.length], 900);
-      burst(24);
+      burst(14);
       gateZ = null;
       phase = "pause";
       phaseTime = 0;
@@ -412,40 +411,66 @@ window.Race = (() => {
   }
 
   function drawGround() {
-    // 2 Bildschirmpixel pro Streifen – sieht gleich aus, halb so viel Arbeit.
-    const step = Math.max(2, Math.round(2 * dpr));
+    // Die Straße besteht aus Abschnitten der Länge SEG. Jeder Abschnitt ist
+    // ein Viereck (Trapez) – scharfe Kanten, und nur ~50 Abschnitte statt
+    // hunderter Bildschirmzeilen.
     const lanes = current ? current.lanes : 4;
     const lw = laneWidth(lanes);
-    for (let y = Math.floor(horizon) + 1; y < H; y += step) {
-      const z = (CAM_H * F) / (y - horizon);
-      const stripe = Math.floor((z + travel) / SEG) % 2 === 0;
-      const dash = Math.floor((z + travel) / 2.2) % 2 === 0;
-      const k = F / z;
-      const center = W / 2 - camX * k;
-      // Wiese
-      g.fillStyle = stripe ? "#4ade80" : "#22c55e";
-      g.fillRect(-W, y, W * 3, step);
-      // Randstreifen rot/weiß
-      const half = ROAD_HALF * k;
-      const rumble = 0.28 * k;
-      g.fillStyle = stripe ? "#ef4444" : "#f8fafc";
-      g.fillRect(center - half - rumble, y, half * 2 + rumble * 2, step);
-      // Straße
-      g.fillStyle = stripe ? "#64748b" : "#5b6578";
-      g.fillRect(center - half, y, half * 2, step);
-      // Spurlinien
-      if (dash) {
+    const zNear = (CAM_H * F) / (H - horizon) * 0.98;
+    const zFar = 170;
+
+    // Wiese als Ganzes, helle Streifen kommen pro Abschnitt dazu.
+    g.fillStyle = "#22c55e";
+    g.fillRect(-W, horizon, W * 3, H - horizon);
+
+    let z0 = zNear;
+    let index = Math.floor((z0 + travel) / SEG);
+    while (z0 < zFar) {
+      // Etwas überlappen, damit zwischen den Abschnitten keine Fugen blitzen.
+      const z1 = Math.min(zFar, (index + 1) * SEG - travel);
+      const zEdge = z1 * 1.004;
+      const even = index % 2 === 0;
+      const y0 = sy(z0), y1 = sy(zEdge);
+      const k0 = F / z0, k1 = F / zEdge;
+      const c0 = W / 2 - camX * k0, c1 = W / 2 - camX * k1;
+      const h0 = ROAD_HALF * k0, h1 = ROAD_HALF * k1;
+      const r0 = 0.28 * k0, r1 = 0.28 * k1;
+
+      if (even) {
+        g.fillStyle = "#4ade80";
+        g.fillRect(-W, y1, W * 3, y0 - y1);
+      }
+      g.fillStyle = even ? "#ef4444" : "#f8fafc";
+      quad(c0 - h0 - r0, c0 + h0 + r0, y0, c1 + h1 + r1, c1 - h1 - r1, y1);
+      g.fillStyle = even ? "#64748b" : "#5b6578";
+      quad(c0 - h0, c0 + h0, y0, c1 + h1, c1 - h1, y1);
+      // Spurlinien: gestrichelt – nur auf jedem zweiten Abschnitt.
+      if (even) {
         g.fillStyle = "#f8fafc";
-        const lineW = Math.max(1, 0.07 * k);
+        const l0 = Math.max(0.6, 0.035 * k0), l1 = Math.max(0.3, 0.035 * k1);
         for (let i = 1; i < lanes; i++) {
-          const x = center + (-ROAD_HALF + lw * i) * k;
-          g.fillRect(x - lineW / 2, y, lineW, step);
+          const x = -ROAD_HALF + lw * i;
+          const x0 = c0 + x * k0, x1 = c1 + x * k1;
+          quad(x0 - l0, x0 + l0, y0, x1 + l1, x1 - l1, y1);
         }
       }
+      z0 = z1;
+      index++;
     }
     // Dunst am Horizont
     g.fillStyle = grad.haze;
     g.fillRect(-W, horizon, W * 3, H * 0.12);
+  }
+
+  /** Trapez: unten von xa bis xb (bei ya), oben von xc bis xd (bei yc). */
+  function quad(xa, xb, ya, xc, xd, yc) {
+    g.beginPath();
+    g.moveTo(xa, ya);
+    g.lineTo(xb, ya);
+    g.lineTo(xc, yc);
+    g.lineTo(xd, yc);
+    g.closePath();
+    g.fill();
   }
 
   function drawRoadside() {
