@@ -2,8 +2,8 @@
  * Rennspiel: Du fährst Auto (Sicht aus dem Fahrersitz). Über jeder Spur hängt
  * ein Schild mit einer Antwort – fahr in die richtige Spur. Das Benzin wird
  * ständig weniger; richtige Antworten füllen den Tank auf, bei einer falschen
- * Antwort läuft der Tank leer. Wer nicht antwortet, verpasst die Frage – das
- * Benzin sinkt dann einfach normal weiter.
+ * Antwort läuft der Tank leer. Beim Antworten sinkt das Benzin gleichmäßig so,
+ * dass der Tank genau am Schild leer ist – wer nicht antwortet, rollt aus.
  *
  * Gezeichnet wird mit einer einfachen Perspektive: Ein Punkt in der Welt
  * (x seitlich, z nach vorn) landet auf dem Bildschirm bei
@@ -206,12 +206,10 @@ window.Race = (() => {
       phase = "pause";
       phaseTime = 0;
     } else if (current.chosen === null) {
-      // Nicht geantwortet: Frage verpasst, weiter geht's – das Benzin sinkt
-      // einfach normal weiter (kein plötzliches Leerlaufen).
-      banner(t("raceMissed"), 900);
-      gateZ = null;
-      phase = "pause";
-      phaseTime = 0;
+      // Nicht geantwortet: Der Tank ist bis zum Schild gleichmäßig leer
+      // gelaufen – jetzt rollt das Auto aus.
+      result = { right: rightAnswer() };
+      stall();
     } else {
       // Falsche Antwort: Der Tank läuft in einem Rutsch leer.
       result = { right: rightAnswer() };
@@ -331,7 +329,13 @@ window.Race = (() => {
       if (gateZ <= GATE_PASS_Z) passGate();
     }
     // Benzin wird während der Fahrt immer weniger.
-    if (["read", "answer", "resolve", "pause"].includes(phase)) {
+    if (phase === "answer" && gateZ !== null) {
+      // Beim Antworten sinkt es gleichmäßig so, dass der Tank genau am Schild
+      // leer ist – wer nicht antwortet, bleibt dort stehen. Kein Ruck am Ende.
+      const secondsLeft = Math.max(dt, (gateZ - GATE_PASS_Z) / speed);
+      fuel -= (fuel * dt) / secondsLeft;
+      setFuel(fuel / 100);
+    } else if (["read", "resolve", "pause"].includes(phase)) {
       fuel -= Math.min(MAX_DRAIN, FUEL_DRAIN + score * FUEL_DRAIN_STEP) * dt;
       setFuel(fuel / 100);
       if (fuel <= 0) stall();
